@@ -1,0 +1,11 @@
+[versions]
+kotlinx-serialization = "1.11.0"
+ktoml = "0.7.1"
+
+[libraries]
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-toml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
+kotlinx-serialization-toml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
+
+[plugins]
+
