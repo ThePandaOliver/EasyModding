@@ -13,7 +13,7 @@ abstract class GenerateNeoForgeMetadataTask : GenerateMetadataTask() {
         val metaInfDir = File(outputDir, "META-INF").apply { mkdirs() }
         val tomlFile = File(metaInfDir, "neoforge.mods.toml")
 
-        val tomlFormat = Toml()
-        tomlFile.writeText(tomlFormat.encodeToString(json))
+//        val tomlFormat = Toml()
+//        tomlFile.writeText(tomlFormat.encodeToString(json))
     }
 }

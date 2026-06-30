@@ -1,5 +1,7 @@
 package dev.pandasystems.easymodding
 
+import dev.pandasystems.easymodding.loader.fabric.FabricMetadataSpec
+import dev.pandasystems.easymodding.loader.neoforge.NeoForgeMetadataSpec
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
@@ -9,6 +11,12 @@ abstract class EasyModdingExtension @Inject constructor(
 ) {
 	val metadata = objects.newInstance(EasyModdingMetadata::class.java)
 	fun metadata(action: Action<EasyModdingMetadata>) = action.execute(metadata)
+
+	val fabric = objects.newInstance(FabricMetadataSpec::class.java)
+	fun fabric(action: Action<FabricMetadataSpec>) = action.execute(fabric)
+
+	val neoForge = objects.newInstance(NeoForgeMetadataSpec::class.java)
+	fun neoForge(action: Action<NeoForgeMetadataSpec>) = action.execute(neoForge)
 
 	val mixins = objects.listProperty(String::class.java)
 	fun mixin(mixin: String) = mixins.add(mixin)

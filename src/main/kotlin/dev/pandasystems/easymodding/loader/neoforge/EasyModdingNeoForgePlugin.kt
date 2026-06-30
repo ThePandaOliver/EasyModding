@@ -15,9 +15,9 @@ class EasyModdingNeoForgePlugin : BaseEasyModdingPlugin() {
 	}
 
 	override fun registerMetadataTask(project: Project): TaskProvider<out GenerateMetadataTask> {
-		return project.tasks.register("generateMetadata", GenerateFabricMetadataTask::class.java) {
+		return project.tasks.register("generateMetadata", GenerateNeoForgeMetadataTask::class.java) {
 			group = "easy-modding"
-			description = "Generates the fabric.mod.json metadata file"
+			description = "Generates the neoforge.mods.toml metadata file"
 
 			extension.convention(project.extensions.getByType(EasyModdingExtension::class.java))
 			outputDirectory.convention(project.layout.buildDirectory.dir("generated/easy-modding"))

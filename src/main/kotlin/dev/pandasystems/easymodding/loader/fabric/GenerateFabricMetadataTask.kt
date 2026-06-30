@@ -16,18 +16,9 @@ import java.io.File
 
 abstract class GenerateFabricMetadataTask : GenerateMetadataTask() {
 	override fun writeMetadata(outputDir: File) {
-
 		val jsonFile = File(outputDir, "fabric.mod.json")
 
-		val json = buildJsonObject {
-			put("schemaVersion", 1)
-			modId.orNull?.let { put("id", it) }
-			modVersion.orNull?.let { put("version", it) }
-			modName.orNull?.let { put("name", it) }
-			modDescription.orNull?.let { put("description", it) }
-		}
-
-		val jsonFormat = Json { prettyPrint = true }
-		jsonFile.writeText(jsonFormat.encodeToString(json))
+//		val jsonFormat = Json { prettyPrint = true }
+//		jsonFile.writeText(jsonFormat.encodeToString(json))
 	}
 }
