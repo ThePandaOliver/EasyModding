@@ -18,12 +18,13 @@ abstract class FabricMetadataSpec @Inject constructor(
 	val id = objects.property<String>()
 	val version = objects.property<String>()
 
-	val provides = objects.listProperty<String>()
 	val environment = objects.property<FabricEnvironment>()
 	val entrypoints = objects.domainObjectContainer(FabricEntrypointSpec::class.java)
 	val jars = objects.listProperty<String>()
 	val languageAdapters = objects.mapProperty<String, String>()
 	val mixins = objects.domainObjectContainer(FabricMixinConfigSpec::class.java)
+	val accessWideners = objects.property<String>()
+	val provides = objects.listProperty<String>()
 
 	val depends = objects.mapProperty<String, String>()
 	val recommends = objects.mapProperty<String, String>()
