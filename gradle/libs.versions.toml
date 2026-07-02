@@ -1,4 +1,5 @@
 [versions]
+kotlin = "2.3.21"
 kotlinx-serialization = "1.11.0"
 ktoml = "0.7.1"
 
@@ -8,4 +9,4 @@ kotlinx-serialization-toml-core = { module = "com.akuleshov7:ktoml-core", versio
 kotlinx-serialization-toml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
 
 [plugins]
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

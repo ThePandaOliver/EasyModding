@@ -1,5 +1,6 @@
 plugins {
 	`kotlin-dsl`
+	alias(libs.plugins.kotlin.serialization)
 }
 
 group = "dev.pandasystems"
