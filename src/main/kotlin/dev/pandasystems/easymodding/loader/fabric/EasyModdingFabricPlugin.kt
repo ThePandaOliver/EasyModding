@@ -3,13 +3,21 @@ package dev.pandasystems.easymodding.loader.fabric
 import dev.pandasystems.easymodding.EasyModdingExtension
 import dev.pandasystems.easymodding.loader.BaseEasyModdingPlugin
 import dev.pandasystems.easymodding.loader.GenerateMetadataTask
-import dev.pandasystems.easymodding.loader.neoforge.GenerateNeoForgeMetadataTask
 import org.gradle.api.Project
 import org.gradle.api.plugins.PluginManager
 import org.gradle.api.tasks.TaskProvider
-import kotlin.jvm.java
 
 class EasyModdingFabricPlugin : BaseEasyModdingPlugin() {
+	override fun apply(target: Project) {
+		super.apply(target)
+
+		val extension = target.extensions.getByType(EasyModdingExtension::class.java)
+
+		target.beforeEvaluate {
+			target.dependencies.add("minecraft", "com.mojang:minecraft:${extension.minecraftVersion.get()}")
+		}
+	}
+
 	override fun applyPlugins(pluginManager: PluginManager) {
 		pluginManager.apply("net.fabricmc.fabric-loom")
 	}
