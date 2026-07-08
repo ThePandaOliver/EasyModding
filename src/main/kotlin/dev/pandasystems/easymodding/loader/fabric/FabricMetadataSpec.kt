@@ -2,11 +2,8 @@ package dev.pandasystems.easymodding.loader.fabric
 
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
-import org.gradle.kotlin.dsl.domainObjectContainer
 import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.mapProperty
-import org.gradle.kotlin.dsl.namedDomainObjectList
 import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 

@@ -10,8 +10,8 @@ abstract class EasyModdingExtension @Inject constructor(
 ) {
 	val minecraftVersion = objects.property(String::class.java)
 
-	val metadata = objects.newInstance(EasyModdingMetadata::class.java)
-	fun metadata(action: Action<EasyModdingMetadata>) = action.execute(metadata)
+	val metadata = objects.newInstance(EasyModdingMetadataSpec::class.java)
+	fun metadata(action: Action<EasyModdingMetadataSpec>) = action.execute(metadata)
 
 	val fabric = objects.newInstance(FabricMetadataSpec::class.java)
 	fun fabric(action: Action<FabricMetadataSpec>) = action.execute(fabric)
@@ -20,7 +20,7 @@ abstract class EasyModdingExtension @Inject constructor(
 	fun mixin(mixin: String) = mixins.add(mixin)
 }
 
-abstract class EasyModdingMetadata @Inject constructor(
+abstract class EasyModdingMetadataSpec @Inject constructor(
 	objects: ObjectFactory
 ) {
 	val id = objects.property(String::class.java)
@@ -31,12 +31,11 @@ abstract class EasyModdingMetadata @Inject constructor(
 	val icon = objects.fileProperty()
 	val environment = objects.property(Environment::class.java).convention(Environment.BOTH)
 
-	val authors = objects.listProperty(Person::class.java)
-	fun author(name: String, contact: String? = null) = authors.add(Person(name, contact))
+	val authors = objects.listProperty(String::class.java)
+	fun author(name: String) = authors.add(name)
 
-	val contributors = objects.listProperty(Person::class.java)
-	fun contributor(name: String, contact: String? = null) = contributors.add(Person(name, contact))
+	val contributors = objects.listProperty(String::class.java)
+	fun contributor(name: String) = contributors.add(name)
 
-	data class Person(val name: String, val contact: String? = null)
 	enum class Environment { CLIENT, SERVER, BOTH }
 }

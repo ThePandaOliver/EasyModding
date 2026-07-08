@@ -1,8 +1,7 @@
 package dev.pandasystems.easymodding.loader.fabric
 
-import dev.pandasystems.easymodding.EasyModdingMetadata
+import dev.pandasystems.easymodding.EasyModdingMetadataSpec
 import dev.pandasystems.easymodding.loader.GenerateMetadataTask
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -29,10 +28,10 @@ abstract class GenerateFabricMetadataTask : GenerateMetadataTask() {
 			.takeIf { it.isNotEmpty() }
 
 		val authors = fabricSpec.authors.takeIf { it.isNotEmpty() }?.map { it.toFabricPerson() }
-			?: metadata.authors.orNull?.takeIf { it.isNotEmpty() }?.map { it.toFabricPerson() }
+			?.plus(metadata.authors.orNull?.takeIf { it.isNotEmpty() }?.map { it.toFabricPerson() } ?: emptyList())
 
 		val contributors = fabricSpec.contributors.takeIf { it.isNotEmpty() }?.map { it.toFabricPerson() }
-			?: metadata.contributors.orNull?.takeIf { it.isNotEmpty() }?.map { it.toFabricPerson() }
+			?.plus(metadata.contributors.orNull?.takeIf { it.isNotEmpty() }?.map { it.toFabricPerson() } ?: emptyList())
 
 		val modJson = FabricModJson(
 			id = fabricSpec.id.orElse(metadata.id).get(),
@@ -74,15 +73,14 @@ abstract class GenerateFabricMetadataTask : GenerateMetadataTask() {
 		FabricEnvironment.BOTH -> "*"
 	}
 
-	private fun EasyModdingMetadata.Environment.toJsonValue(): String = when (this) {
-		EasyModdingMetadata.Environment.CLIENT -> "client"
-		EasyModdingMetadata.Environment.SERVER -> "server"
-		EasyModdingMetadata.Environment.BOTH -> "*"
+	private fun EasyModdingMetadataSpec.Environment.toJsonValue(): String = when (this) {
+		EasyModdingMetadataSpec.Environment.CLIENT -> "client"
+		EasyModdingMetadataSpec.Environment.SERVER -> "server"
+		EasyModdingMetadataSpec.Environment.BOTH -> "*"
 	}
 
 	private fun FabricPersonSpec.toFabricPerson(): FabricPerson =
 		FabricPerson(name.get(), contact.orNull?.takeIf { it.isNotEmpty() })
 
-	private fun EasyModdingMetadata.Person.toFabricPerson(): FabricPerson =
-		FabricPerson(name, contact?.let { mapOf("homepage" to it) })
+	private fun String.toFabricPerson(): FabricPerson = FabricPerson(this)
 }

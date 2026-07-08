@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "id": "easymodding",
+    "version": "1.0.0",
+    "name": "Easy Modding",
+    "description": "A simple mod for testing purposes",
+    "license": "MIT",
+    "icon": "icon.png",
+    "authors": [
+      "Author name",
+      {
+        "name": "Author with contacts",
+        "contact": {
+          "homepage": "https://example.com",
+          "issues": "https://example.com/issues",
+          "custom": "custom contact information"
+        }
+      }
+    ],
+    "contributors": [
+      "Contributor name",
+      {
+        "name": "Contributor with contacts",
+        "contact": {
+          "homepage": "https://example.com",
+          "issues": "https://example.com/issues",
+          "custom": "custom contact information"
+        }
+      }
+    ],
+    "contact": {
+      "homepage": "https://example.com",
+      "issues": "https://example.com/issues",
+      "custom": "custom contact information"
+    }
+  },
+  "mixins": [
+    "example.mixins.json"
+  ],
+  "fabric": {
+    "entrypoints": {
+      "client": [
+        "com.example.mod.FabricClient"
+      ],
+      "main": [
+        "com.example.mod.FabricCommon"
+      ]
+    },
+    "accessWidener": "example.accesswidener"
+  }
+}

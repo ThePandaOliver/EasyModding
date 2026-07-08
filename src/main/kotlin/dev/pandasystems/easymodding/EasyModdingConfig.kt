@@ -1,0 +1,72 @@
+package dev.pandasystems.easymodding
+
+import dev.pandasystems.easymodding.loader.fabric.FabricModJson
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+
+typealias EasyModdingContact = Map<String, String>
+
+@Serializable
+data class EasyModdingConfig(
+	val schemaVersion: Int = 1,
+	val metadata: EasyModdingMetadata,
+	val mixins: List<String>? = null,
+	val fabric: FabricModJson? = null,
+)
+
+@Serializable
+data class EasyModdingMetadata(
+	val id: String,
+	val version: String,
+	val name: String?,
+	val description: String?,
+	val license: String?,
+	val icon: String?,
+	val authors: List<EasyModdingPerson>?,
+	val contributors: List<EasyModdingPerson>?,
+	val contact: EasyModdingContact?,
+)
+
+@Serializable(with = EasyModdingPersonSerializer::class)
+data class EasyModdingPerson(
+	val name: String,
+	val contact: EasyModdingContact? = null
+)
+
+object EasyModdingPersonSerializer : KSerializer<EasyModdingPerson> {
+	override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
+
+	override fun serialize(encoder: Encoder, value: EasyModdingPerson) {
+		val element = if (value.contact.isNullOrEmpty()) {
+			JsonPrimitive(value.name)
+		} else {
+			buildJsonObject {
+				put("name", value.name)
+				put("contact", buildJsonObject { value.contact.forEach { (key, v) -> put(key, v) } })
+			}
+		}
+		encoder.encodeSerializableValue(JsonElement.serializer(), element)
+	}
+
+	override fun deserialize(decoder: Decoder): EasyModdingPerson {
+		return when (val element = decoder.decodeSerializableValue(JsonElement.serializer())) {
+			is JsonPrimitive -> EasyModdingPerson(element.content)
+			is JsonObject -> EasyModdingPerson(
+				name = element.getValue("name").jsonPrimitive.content,
+				contact = element["contact"]?.jsonObject?.mapValues { it.value.jsonPrimitive.content }
+			)
+			else -> throw SerializationException("Unexpected JSON for EasyModdingPerson: $element")
+		}
+	}
+}

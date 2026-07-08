@@ -19,8 +19,8 @@ import kotlinx.serialization.json.put
 @Serializable
 data class FabricModJson(
 	val schemaVersion: Int = 1,
-	val id: String,
-	val version: String,
+	val id: String? = null,
+	val version: String? = null,
 
 	val name: String? = null,
 	val description: String? = null,
@@ -82,10 +82,6 @@ object FabricPersonSerializer : KSerializer<FabricPerson> {
 	}
 }
 
-/**
- * Serialized as a plain config path string when the environment is unrestricted,
- * otherwise as `{"config": ..., "environment": ...}`, matching the fabric.mod.json mixin format.
- */
 @Serializable(with = FabricMixinEntrySerializer::class)
 data class FabricMixinEntry(
 	val config: String,
