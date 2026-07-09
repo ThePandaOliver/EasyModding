@@ -9,17 +9,15 @@ import org.gradle.api.tasks.TaskProvider
 
 class EasyModdingFabricPlugin : BaseEasyModdingPlugin() {
 	override fun apply(target: Project) {
+		target.pluginManager.apply("net.fabricmc.fabric-loom")
+
 		super.apply(target)
 
 		val extension = target.extensions.getByType(EasyModdingExtension::class.java)
 
 		target.beforeEvaluate {
-			target.dependencies.add("minecraft", "com.mojang:minecraft:${extension.minecraftVersion.get()}")
+			dependencies.add("minecraft", "com.mojang:minecraft:${extension.minecraftVersion.get()}")
 		}
-	}
-
-	override fun applyPlugins(pluginManager: PluginManager) {
-		pluginManager.apply("net.fabricmc.fabric-loom")
 	}
 
 	override fun registerMetadataTask(project: Project): TaskProvider<out GenerateMetadataTask> {

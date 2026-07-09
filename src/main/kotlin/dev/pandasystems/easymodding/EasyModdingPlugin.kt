@@ -6,7 +6,7 @@ import org.gradle.internal.extensions.core.extra
 
 class EasyModdingPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-		target.extensions.create("easyModding", EasyModdingExtension::class.java)
+		val extension = target.extensions.create("easyModding", EasyModdingExtension::class.java)
 
 		when (target.extra["easy_modding.platform"]) {
 			"loom" -> target.pluginManager.apply("dev.pandasystems.easymodding.fabric")

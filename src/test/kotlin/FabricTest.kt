@@ -1,43 +1,46 @@
+import dev.pandasystems.easymodding.EasyModdingExtension
 import dev.pandasystems.easymodding.loadEasyModdingConfig
-import dev.pandasystems.easymodding.populateFabricModJson
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import dev.pandasystems.easymodding.loader.GenerateMetadataTask
+import dev.pandasystems.easymodding.loader.fabric.populateFabricModJson
+import dev.pandasystems.easymodding.loader.fabric.toJsonString
+import kotlinx.serialization.json.*
+import org.gradle.api.internal.project.DefaultProject
+import org.gradle.internal.extensions.core.extra
+import org.gradle.kotlin.dsl.getByName
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.text.get
 
 class FabricTest {
-//	@Test
-//	fun testFile(@TempDir projectDir: File) {
-//		val project = ProjectBuilder
-//			.builder()
-//			.withProjectDir(projectDir)
-//			.build()
-//
-//		project.extra["easy_modding.platform"] = "loom"
-//		project.repositories.mavenCentral()
-//		project.plugins.apply("dev.pandasystems.easymodding")
-//
-//		val easyModdingExtension = project.extensions.getByType(EasyModdingExtension::class.java)
-//		easyModdingExtension.minecraftVersion.set("26.2")
-//		easyModdingExtension.fabric.id.set("test")
-//		easyModdingExtension.fabric.version.set("1")
-//
-//		(project as DefaultProject).evaluate()
-//		val task = project.tasks.getByName<GenerateMetadataTask>("generateMetadata")
-//		task.run()
-//		println(task.outputDirectory.get().asFile.resolve("fabric.mod.json").readText(Charsets.UTF_8))
-//	}
+	@Test
+	fun testTask(@TempDir projectDir: File) {
+		val project = ProjectBuilder
+			.builder()
+			.withProjectDir(projectDir)
+			.build()
+
+		project.extra["easy_modding.platform"] = "loom"
+		project.repositories.mavenCentral()
+		project.plugins.apply("dev.pandasystems.easymodding")
+
+		project.extensions.getByType(EasyModdingExtension::class.java).apply {
+			minecraftVersion.set("26.2")
+			val resourceUrl = this::class.java.classLoader.getResource("easymodding.mod.json")
+				?: throw IllegalArgumentException("Resource not found")
+			metadataPath.set(File(resourceUrl.toURI()))
+		}
+
+		(project as DefaultProject).evaluate()
+		val task = project.tasks.getByName<GenerateMetadataTask>("generateMetadata")
+		task.run()
+		println(task.outputDirectory.get().asFile.resolve("fabric.mod.json").readText(Charsets.UTF_8))
+	}
 
 	@Test
 	fun testSerialization() {
-		val resourceUrl = this::class.java.classLoader.getResource("example.mod.json")
+		val resourceUrl = this::class.java.classLoader.getResource("easymodding.mod.json")
 			?: throw IllegalArgumentException("Resource not found")
 
 		val file = File(resourceUrl.toURI())
@@ -49,12 +52,12 @@ class FabricTest {
 			ignoreUnknownKeys = true
 			prettyPrint = true
 			encodeDefaults = true
-			prettyPrintIndent = "	"
 			explicitNulls = false
 		}
 
-		val json = jsonFormat.encodeToJsonElement(fabric).jsonObject
-		println(jsonFormat.encodeToString(json))
+		val jsonString = fabric.toJsonString()
+		println(jsonString)
+		val json = jsonFormat.decodeFromString<JsonObject>(jsonString)
 
 		assertEquals(1, json["schemaVersion"]?.jsonPrimitive?.int)
 		assertEquals("easymodding", json["id"]?.jsonPrimitive?.content)

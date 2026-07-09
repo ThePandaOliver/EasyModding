@@ -1,41 +1,22 @@
 package dev.pandasystems.easymodding
 
-import dev.pandasystems.easymodding.loader.fabric.FabricMetadataSpec
+import dev.pandasystems.easymodding.loader.fabric.FabricExtension
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
+import org.gradle.kotlin.dsl.property
+import org.gradle.kotlin.dsl.provideDelegate
+import java.io.File
 import javax.inject.Inject
+import kotlin.getValue
 
 abstract class EasyModdingExtension @Inject constructor(
 	objects: ObjectFactory
 ) {
-	val minecraftVersion = objects.property(String::class.java)
+	val minecraftVersion = objects.property<String>()
 
-	val metadata = objects.newInstance(EasyModdingMetadataSpec::class.java)
-	fun metadata(action: Action<EasyModdingMetadataSpec>) = action.execute(metadata)
+	val metadataPath = objects.fileProperty().convention { File("easymodding.mod.json") }
+	val metadata = metadataPath.map { loadEasyModdingConfig(it.asFile) }
 
-	val fabric = objects.newInstance(FabricMetadataSpec::class.java)
-	fun fabric(action: Action<FabricMetadataSpec>) = action.execute(fabric)
-
-	val mixins = objects.listProperty(String::class.java)
-	fun mixin(mixin: String) = mixins.add(mixin)
-}
-
-abstract class EasyModdingMetadataSpec @Inject constructor(
-	objects: ObjectFactory
-) {
-	val id = objects.property(String::class.java)
-	val version = objects.property(String::class.java)
-	val name = objects.property(String::class.java)
-	val description = objects.property(String::class.java)
-	val license = objects.property(String::class.java)
-	val icon = objects.fileProperty()
-	val environment = objects.property(Environment::class.java).convention(Environment.BOTH)
-
-	val authors = objects.listProperty(String::class.java)
-	fun author(name: String) = authors.add(name)
-
-	val contributors = objects.listProperty(String::class.java)
-	fun contributor(name: String) = contributors.add(name)
-
-	enum class Environment { CLIENT, SERVER, BOTH }
+	val fabric = objects.newInstance(FabricExtension::class.java)
+	fun fabric(action: Action<FabricExtension>) = action.execute(fabric).also { fabric.enabled.set(true) }
 }
