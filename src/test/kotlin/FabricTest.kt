@@ -29,11 +29,13 @@ class FabricTest {
 			minecraftVersion.set("26.2")
 			val resourceUrl = this::class.java.classLoader.getResource("easymodding.mod.json")
 				?: throw IllegalArgumentException("Resource not found")
-			metadataPath.set(File(resourceUrl.toURI()))
+			configPath.set(File(resourceUrl.toURI()))
+
+			fabric {}
 		}
 
 		(project as DefaultProject).evaluate()
-		val task = project.tasks.getByName<GenerateMetadataTask>("generateMetadata")
+		val task = project.tasks.getByName<GenerateMetadataTask>("generateFabricMetadata")
 		task.run()
 		println(task.outputDirectory.get().asFile.resolve("fabric.mod.json").readText(Charsets.UTF_8))
 	}

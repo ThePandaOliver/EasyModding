@@ -1,12 +1,14 @@
 package dev.pandasystems.easymodding
 
 import dev.pandasystems.easymodding.loader.fabric.FabricModJson
+import dev.pandasystems.easymodding.loader.neoforge.NeoForgeModToml
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -14,6 +16,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import java.io.File
 
 typealias EasyModdingContact = Map<String, String>
 
@@ -22,7 +25,8 @@ data class EasyModdingConfig(
 	val schemaVersion: Int = 1,
 	val metadata: EasyModdingMetadata,
 	val mixins: List<String>? = null,
-	val fabric: FabricModJson? = null,
+	val fabric: FabricModJson = FabricModJson(),
+	val neoforge: NeoForgeModToml = NeoForgeModToml(),
 )
 
 @Serializable
@@ -69,4 +73,12 @@ object EasyModdingPersonSerializer : KSerializer<EasyModdingPerson> {
 			else -> throw SerializationException("Unexpected JSON for EasyModdingPerson: $element")
 		}
 	}
+}
+
+fun loadEasyModdingConfig(file: File): EasyModdingConfig {
+	val json = Json {
+		ignoreUnknownKeys = true
+	}
+	val easyModding = json.decodeFromString<EasyModdingConfig>(file.readText())
+	return easyModding
 }

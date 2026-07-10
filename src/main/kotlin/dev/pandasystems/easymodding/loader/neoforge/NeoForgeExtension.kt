@@ -1,4 +1,4 @@
-package dev.pandasystems.easymodding.loader.fabric
+package dev.pandasystems.easymodding.loader.neoforge
 
 import dev.pandasystems.easymodding.loader.LoaderExtension
 import org.gradle.api.model.ObjectFactory
@@ -6,9 +6,11 @@ import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
-abstract class FabricExtension @Inject constructor(
+abstract class NeoForgeExtension @Inject constructor(
 	private val objects: ObjectFactory,
 ) : LoaderExtension {
-	override val enabled = objects.property<Boolean>().convention(false)
+	override val enabled: Property<Boolean> = objects.property<Boolean>().convention(false)
 	override val enabledMetadataGeneration: Property<Boolean> = objects.property<Boolean>().convention(enabled)
+
+	val neoForgeVersion: Property<String> = objects.property<String>()
 }

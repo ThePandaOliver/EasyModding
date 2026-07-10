@@ -118,7 +118,7 @@ object FabricMixinEntrySerializer : KSerializer<FabricMixinEntry> {
 }
 
 fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
-	return fabric?.copy(
+	return fabric.copy(
 		id = fabric.id ?: metadata.id,
 		version = fabric.version ?: metadata.version,
 		name = fabric.name ?: metadata.name,
@@ -129,7 +129,7 @@ fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
 		contributors = fabric.contributors ?: metadata.contributors?.map { (name, contact) -> FabricPerson(name, contact) },
 		contact = fabric.contact ?: metadata.contact,
 		mixins = fabric.mixins ?: mixins?.map { FabricMixinEntry(it) },
-	) ?: FabricModJson()
+	)
 }
 
 fun FabricModJson.toJsonString(): String {

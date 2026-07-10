@@ -43,5 +43,10 @@ gradlePlugin {
 			id = "dev.pandasystems.easymodding.fabric"
 			implementationClass = "dev.pandasystems.easymodding.loader.fabric.EasyModdingFabricPlugin"
 		}
+
+		register("easy-modding-neoforge") {
+			id = "dev.pandasystems.easymodding.neoforge"
+			implementationClass = "dev.pandasystems.easymodding.loader.neoforge.EasyModdingNeoForgePlugin"
+		}
 	}
 }

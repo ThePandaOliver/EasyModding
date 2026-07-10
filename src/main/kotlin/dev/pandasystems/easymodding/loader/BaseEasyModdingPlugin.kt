@@ -8,15 +8,5 @@ import org.gradle.api.tasks.TaskProvider
 
 abstract class BaseEasyModdingPlugin : Plugin<Project> {
 	override fun apply(target: Project) {
-		val generateMetadataTask = registerMetadataTask(target)
-
-		target.plugins.withId("java") {
-			val javaExtension = target.extensions.getByType(JavaPluginExtension::class.java)
-			val mainSourceSet = javaExtension.sourceSets.getByName("main")
-
-			mainSourceSet.resources.srcDir(generateMetadataTask.flatMap { it.outputDirectory })
-		}
 	}
-
-	abstract fun registerMetadataTask(project: Project): TaskProvider<out GenerateMetadataTask>
 }
