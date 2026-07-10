@@ -1,6 +1,7 @@
 plugins {
 	`kotlin-dsl`
 	alias(libs.plugins.kotlin.serialization)
+	`maven-publish`
 }
 
 group = "dev.pandasystems"
@@ -22,7 +23,7 @@ dependencies {
 	fun implementPlugin(id: String, version: String) = implementation("$id:$id.gradle.plugin:$version")
 
 	implementPlugin("net.fabricmc.fabric-loom", "1.17-SNAPSHOT")
-	implementPlugin("net.neoforged.moddev", "2.0.+")
+	implementPlugin("net.neoforged.moddev", "2.0.141")
 }
 
 kotlin {
@@ -47,6 +48,15 @@ gradlePlugin {
 		register("easy-modding-neoforge") {
 			id = "dev.pandasystems.easymodding.neoforge"
 			implementationClass = "dev.pandasystems.easymodding.loader.neoforge.EasyModdingNeoForgePlugin"
+		}
+	}
+}
+
+publishing {
+	repositories {
+		maven {
+			name = "LocalRepo"
+			url = uri("C:\\Users\\Olive\\maven-repo")
 		}
 	}
 }

@@ -78,6 +78,7 @@ object EasyModdingPersonSerializer : KSerializer<EasyModdingPerson> {
 fun loadEasyModdingConfig(file: File): EasyModdingConfig {
 	val json = Json {
 		ignoreUnknownKeys = true
+		explicitNulls = false
 	}
 	val easyModding = json.decodeFromString<EasyModdingConfig>(file.readText())
 	return easyModding
