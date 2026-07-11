@@ -33,13 +33,13 @@ data class EasyModdingConfig(
 data class EasyModdingMetadata(
 	val id: String,
 	val version: String,
-	val name: String?,
-	val description: String?,
-	val license: String?,
-	val icon: String?,
-	val authors: List<EasyModdingPerson>?,
-	val contributors: List<EasyModdingPerson>?,
-	val contact: EasyModdingContact?,
+	val name: String? = null,
+	val description: String? = null,
+	val license: String? = null,
+	val icon: String? = null,
+	val authors: List<EasyModdingPerson>? = null,
+	val contributors: List<EasyModdingPerson>? = null,
+	val contact: EasyModdingContact? = null,
 )
 
 @Serializable(with = EasyModdingPersonSerializer::class)

@@ -36,7 +36,7 @@ tasks.test {
 
 gradlePlugin {
 	plugins {
-		register("easy-modding") {
+		register("easy-modding-metadata") {
 			id = "dev.pandasystems.easymodding"
 			implementationClass = "dev.pandasystems.easymodding.EasyModdingPlugin"
 		}

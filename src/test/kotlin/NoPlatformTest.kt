@@ -1,7 +1,6 @@
 import dev.pandasystems.easymodding.EasyModdingExtension
 import dev.pandasystems.easymodding.loader.GenerateMetadataTask
 import org.gradle.api.internal.project.DefaultProject
-import org.gradle.internal.extensions.core.extra
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.io.TempDir

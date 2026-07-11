@@ -1,5 +1,6 @@
 package dev.pandasystems.easymodding.loader
 
+import dev.pandasystems.easymodding.EasyModdingConfig
 import dev.pandasystems.easymodding.EasyModdingExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -13,8 +14,8 @@ import java.io.File
 
 @CacheableTask
 abstract class GenerateMetadataTask : DefaultTask() {
-    @get:Internal
-    abstract val extension: Property<EasyModdingExtension>
+    @get:Input
+    abstract val config: Property<EasyModdingConfig>
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty

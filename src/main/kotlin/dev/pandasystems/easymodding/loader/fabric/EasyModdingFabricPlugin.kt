@@ -1,13 +1,10 @@
 package dev.pandasystems.easymodding.loader.fabric
 
 import dev.pandasystems.easymodding.EasyModdingExtension
-import dev.pandasystems.easymodding.loader.BaseEasyModdingPlugin
-import dev.pandasystems.easymodding.loader.GenerateMetadataTask
+import dev.pandasystems.easymodding.EasyModdingPlugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.PluginManager
-import org.gradle.api.tasks.TaskProvider
 
-class EasyModdingFabricPlugin : BaseEasyModdingPlugin() {
+class EasyModdingFabricPlugin : EasyModdingPlugin() {
 	override fun apply(target: Project) {
 		target.pluginManager.apply("net.fabricmc.fabric-loom")
 		val extension = target.extensions.getByType(EasyModdingExtension::class.java)
