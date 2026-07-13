@@ -1,5 +1,5 @@
 import dev.pandasystems.easymodding.EasyModdingExtension
-import dev.pandasystems.easymodding.loader.GenerateMetadataTask
+import dev.pandasystems.easymodding.tasks.GenerateMetadataTask
 import org.gradle.api.internal.project.DefaultProject
 import org.gradle.internal.extensions.core.extra
 import org.gradle.kotlin.dsl.getByName
@@ -34,7 +34,7 @@ class NeoForgeTest {
 		(project as DefaultProject).evaluate()
 		val task = project.tasks.getByName<GenerateMetadataTask>("generateMetadata")
 		task.run()
-		println(task.outputFile.asFile.get().readText(Charsets.UTF_8))
+		println(File(task.outputDirectory.asFile.get(), "neoforge.mod.json").readText(Charsets.UTF_8))
 	}
 
 //	@Test

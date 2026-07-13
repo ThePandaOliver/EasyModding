@@ -1,6 +1,6 @@
 import dev.pandasystems.easymodding.EasyModdingExtension
 import dev.pandasystems.easymodding.loadEasyModdingConfig
-import dev.pandasystems.easymodding.loader.GenerateMetadataTask
+import dev.pandasystems.easymodding.tasks.GenerateMetadataTask
 import dev.pandasystems.easymodding.loader.fabric.populateFabricModJson
 import dev.pandasystems.easymodding.loader.fabric.toJsonString
 import kotlinx.serialization.json.*
@@ -37,7 +37,7 @@ class FabricTest {
 		(project as DefaultProject).evaluate()
 		val task = project.tasks.getByName<GenerateMetadataTask>("generateMetadata")
 		task.run()
-		println(task.outputFile.asFile.get().readText(Charsets.UTF_8))
+		println(File(task.outputDirectory.asFile.get(), "fabric.mod.json").readText(Charsets.UTF_8))
 	}
 
 	@Test

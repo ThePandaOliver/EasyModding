@@ -13,18 +13,5 @@ class EasyModdingFabricPlugin : EasyModdingPlugin() {
 		target.beforeEvaluate {
 			dependencies.add("minecraft", "com.mojang:minecraft:${extension.minecraftVersion.get()}")
 		}
-
-		val generateMetadataTask =
-			target.tasks.register("generateMetadata", GenerateFabricMetadataTask::class.java) {
-				config.convention(extension.config)
-				outputFile.convention(target.layout.buildDirectory.file("generated/easy-modding/fabric.mod.json"))
-				enabled = extension.fabric.enabled.get()
-			}
-
-		target.tasks.named("processResources", ProcessResources::class.java) {
-			from(target.provider {
-				if (extension.fabric.enabled.get()) generateMetadataTask else emptyList<Any>()
-			})
-		}
 	}
 }
