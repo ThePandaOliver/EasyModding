@@ -24,6 +24,8 @@ abstract class GenerateNeoForgeMetadataTask : DefaultTask() {
     @TaskAction
     fun run() {
         val config = loadEasyModdingConfig(configFile.get().asFile)
-        outputFile.get().asFile.writeText(config.populateNeoForgeModToml().toTomlString())
+        val file = outputFile.get().asFile
+        file.parentFile.mkdirs()
+        file.writeText(config.populateNeoForgeModToml().toTomlString())
     }
 }
