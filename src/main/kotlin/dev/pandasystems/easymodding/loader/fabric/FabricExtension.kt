@@ -10,5 +10,4 @@ abstract class FabricExtension @Inject constructor(
 	private val objects: ObjectFactory,
 ) : LoaderExtension {
 	override val enabled = objects.property<Boolean>().convention(false)
-	override val enabledMetadataGeneration: Property<Boolean> = objects.property<Boolean>().convention(enabled)
 }

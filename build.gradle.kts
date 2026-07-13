@@ -36,7 +36,7 @@ tasks.test {
 
 gradlePlugin {
 	plugins {
-		register("easy-modding-metadata") {
+		register("easy-modding") {
 			id = "dev.pandasystems.easymodding"
 			implementationClass = "dev.pandasystems.easymodding.EasyModdingPlugin"
 		}
@@ -56,7 +56,7 @@ publishing {
 	repositories {
 		maven {
 			name = "LocalRepo"
-			url = uri("C:\\Users\\Olive\\maven-repo")
+			url = uri("D:\\Maven Repo")
 		}
 	}
 }

@@ -17,8 +17,16 @@ abstract class EasyModdingExtension @Inject constructor(
 	val config = configPath.map { loadEasyModdingConfig(it.asFile) }
 
 	val fabric = objects.newInstance(FabricExtension::class.java)
-	fun fabric(action: Action<FabricExtension>) = action.execute(fabric).also { fabric.enabled.set(true) }
+	fun fabric(action: Action<FabricExtension>) {
+		fabric.enabled.set(true)
+		action.execute(fabric)
+	}
+	fun fabric() = fabric.enabled.set(true)
 
 	val neoForge = objects.newInstance(NeoForgeExtension::class.java)
-	fun neoForge(action: Action<NeoForgeExtension>) = action.execute(neoForge).also { neoForge.enabled.set(true) }
+	fun neoForge(action: Action<NeoForgeExtension>) {
+		neoForge.enabled.set(true)
+		action.execute(neoForge)
+	}
+	fun neoForge() = neoForge.enabled.set(true)
 }

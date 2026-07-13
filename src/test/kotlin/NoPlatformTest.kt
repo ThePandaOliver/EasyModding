@@ -23,20 +23,11 @@ class NoPlatformTest {
 				?: throw IllegalArgumentException("Resource not found")
 			configPath.set(File(resourceUrl.toURI()))
 
-			neoForge {
-				enabled.set(false)
-				enabledMetadataGeneration.set(true)
-			}
-
-			fabric {
-				enabled.set(false)
-				enabledMetadataGeneration.set(true)
-			}
+			neoForge()
+			fabric()
 		}
 
 		(project as DefaultProject).evaluate()
-		project.tasks.getByName<GenerateMetadataTask>("generateNeoForgeMetadata").run()
-		project.tasks.getByName<GenerateMetadataTask>("generateFabricMetadata").run()
 	}
 
 //	@Test

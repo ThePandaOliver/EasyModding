@@ -4,5 +4,4 @@ import org.gradle.api.provider.Property
 
 interface LoaderExtension {
 	val enabled: Property<Boolean>
-	val enabledMetadataGeneration: Property<Boolean>
 }

@@ -16,7 +16,7 @@ class NeoForgeTest {
 			.withProjectDir(projectDir)
 			.build()
 
-		project.extra["easy_modding.platform"] = "moddevgradle"
+		project.extra["easy_modding.platform"] = "neoforge"
 		project.repositories.mavenCentral()
 		project.plugins.apply("dev.pandasystems.easymodding")
 
@@ -32,9 +32,9 @@ class NeoForgeTest {
 		}
 
 		(project as DefaultProject).evaluate()
-		val task = project.tasks.getByName<GenerateMetadataTask>("generateNeoForgeMetadata")
+		val task = project.tasks.getByName<GenerateMetadataTask>("generateMetadata")
 		task.run()
-		println(task.outputDirectory.get().asFile.resolve("META-INF/neoforge.mods.toml").readText(Charsets.UTF_8))
+		println(task.outputFile.asFile.get().readText(Charsets.UTF_8))
 	}
 
 //	@Test

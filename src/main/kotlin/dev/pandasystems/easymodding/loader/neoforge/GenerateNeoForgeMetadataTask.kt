@@ -6,12 +6,7 @@ import java.io.File
 
 @CacheableTask
 abstract class GenerateNeoForgeMetadataTask : GenerateMetadataTask() {
-	override fun writeMetadata(outputDir: File) {
-		val extension = extension.get()
-		val jsonFile = File(outputDir, "META-INF/neoforge.mods.toml")
-		if (!jsonFile.parentFile.exists()) {
-			jsonFile.parentFile.mkdirs()
-		}
-		jsonFile.writeText(extension.config.get().populateNeoForgeModToml().toTomlString())
+	override fun writeMetadata(outputFile: File) {
+		outputFile.writeText(config.get().populateNeoForgeModToml().toTomlString())
 	}
 }

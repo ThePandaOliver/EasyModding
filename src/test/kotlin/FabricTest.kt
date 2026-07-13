@@ -21,7 +21,7 @@ class FabricTest {
 			.withProjectDir(projectDir)
 			.build()
 
-		project.extra["easy_modding.platform"] = "loom"
+		project.extra["easy_modding.platform"] = "fabric"
 		project.repositories.mavenCentral()
 		project.plugins.apply("dev.pandasystems.easymodding")
 
@@ -31,13 +31,13 @@ class FabricTest {
 				?: throw IllegalArgumentException("Resource not found")
 			configPath.set(File(resourceUrl.toURI()))
 
-			fabric {}
+			fabric()
 		}
 
 		(project as DefaultProject).evaluate()
-		val task = project.tasks.getByName<GenerateMetadataTask>("generateFabricMetadata")
+		val task = project.tasks.getByName<GenerateMetadataTask>("generateMetadata")
 		task.run()
-		println(task.outputDirectory.get().asFile.resolve("fabric.mod.json").readText(Charsets.UTF_8))
+		println(task.outputFile.asFile.get().readText(Charsets.UTF_8))
 	}
 
 	@Test
