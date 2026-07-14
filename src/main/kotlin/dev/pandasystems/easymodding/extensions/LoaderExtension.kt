@@ -1,4 +1,4 @@
-package dev.pandasystems.easymodding.platform
+package dev.pandasystems.easymodding.extensions
 
 import org.gradle.api.provider.Property
 

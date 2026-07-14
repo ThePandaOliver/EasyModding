@@ -38,7 +38,7 @@ class EasyModdingPlugin : Plugin<Project> {
 
 		target.tasks.named("processResources", ProcessResources::class.java) {
 			from(generateFabricMetadata)
-			from(generateNeoForgeMetadata) { into("META-INF") }
+			from(generateNeoForgeMetadata)
 		}
 	}
 }
