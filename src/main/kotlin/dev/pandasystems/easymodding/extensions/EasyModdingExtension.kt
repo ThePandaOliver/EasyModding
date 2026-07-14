@@ -18,6 +18,8 @@ abstract class EasyModdingExtension @Inject constructor(
 	val fabric = objects.newInstance(FabricExtension::class.java)
 	val neoForge = objects.newInstance(NeoForgeExtension::class.java)
 
+	val dependencies = objects.newInstance(EasyModdingDependencies::class.java)
+
 	init {
 		configPath.convention(layout.projectDirectory.file("easymodding.mod.json"))
 	}
@@ -33,4 +35,8 @@ abstract class EasyModdingExtension @Inject constructor(
 		action.execute(neoForge)
 	}
 	fun neoForge() = neoForge.enabled.set(true)
+
+	fun dependencies(action: Action<EasyModdingDependencies>) {
+		action.execute(dependencies)
+	}
 }
