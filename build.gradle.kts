@@ -40,13 +40,13 @@ gradlePlugin {
 			id = "dev.pandasystems.easymodding"
 			implementationClass = "dev.pandasystems.easymodding.EasyModdingPlugin"
 		}
-		register("easy-modding-fabric") {
-			id = "dev.pandasystems.easymodding.fabric"
-			implementationClass = "dev.pandasystems.easymodding.loader.fabric.EasyModdingFabricPlugin"
+		register("easy-modding-loom") {
+			id = "dev.pandasystems.easymodding.loom"
+			implementationClass = "dev.pandasystems.easymodding.platform.loom.EasyModdingLoomPlugin"
 		}
-		register("easy-modding-neoforge") {
-			id = "dev.pandasystems.easymodding.neoforge"
-			implementationClass = "dev.pandasystems.easymodding.loader.neoforge.EasyModdingNeoForgePlugin"
+		register("easy-modding-moddev") {
+			id = "dev.pandasystems.easymodding.moddev"
+			implementationClass = "dev.pandasystems.easymodding.platform.moddev.EasyModdingModdevPlugin"
 		}
 	}
 }

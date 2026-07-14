@@ -22,26 +22,37 @@ data class PackMcmeta(
 			else if (pack.packFormat != null) PackData(minFormat = pack.packFormat, maxFormat = pack.packFormat)
 			else throw IllegalArgumentException("Pack format not specified")
 		})
-
-	internal fun toJsonString(): String {
-		val jsonFormat = Json {
-			encodeDefaults = true
-			ignoreUnknownKeys = true
-			prettyPrint = true
-			explicitNulls = false
-		}
-		return jsonFormat.encodeToString(this)
-	}
 }
 
 @Serializable
 data class PackData(
 	val description: String? = null,
 	@SerialName("pack_format")
-	val packFormat: Int? = null,
+	val packFormat: Float? = null,
 	@SerialName("min_format")
-	val minFormat: Int? = null,
+	val minFormat: Float? = null,
 	@SerialName("max_format")
-	val maxFormat: Int? = null,
+	val maxFormat: Float? = null,
 
 )
+
+internal fun EasyModdingConfig.populatePackJson(): PackMcmeta {
+	return PackMcmeta(
+		pack = PackData(
+			description = pack?.description,
+			packFormat = pack?.packFormat,
+			minFormat = pack?.minFormat,
+			maxFormat = pack?.maxFormat
+		)
+	)
+}
+
+internal fun PackMcmeta.toJsonString(): String {
+	val jsonFormat = Json {
+		encodeDefaults = true
+		ignoreUnknownKeys = true
+		prettyPrint = true
+		explicitNulls = false
+	}
+	return jsonFormat.encodeToString(this)
+}

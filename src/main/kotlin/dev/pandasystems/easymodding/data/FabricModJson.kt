@@ -1,6 +1,5 @@
 package dev.pandasystems.easymodding.data
 
-import dev.pandasystems.easymodding.EasyModdingConfig
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -117,7 +116,7 @@ object FabricMixinEntrySerializer : KSerializer<FabricMixinEntry> {
 	}
 }
 
-fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
+internal fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
 	return fabric.copy(
 		id = fabric.id ?: metadata.id,
 		version = fabric.version ?: metadata.version,
@@ -132,7 +131,7 @@ fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
 	)
 }
 
-fun FabricModJson.toJsonString(): String {
+internal fun FabricModJson.toJsonString(): String {
 	val jsonFormat = Json {
 		ignoreUnknownKeys = true
 		prettyPrint = true

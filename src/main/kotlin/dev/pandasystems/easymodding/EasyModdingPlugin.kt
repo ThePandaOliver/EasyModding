@@ -16,14 +16,14 @@ class EasyModdingPlugin : Plugin<Project> {
 		target.pluginManager.apply("idea")
 
 		when (platform) {
-			"fabric" -> target.pluginManager.apply("dev.pandasystems.easymodding.fabric")
-			"neoforge" -> target.pluginManager.apply("dev.pandasystems.easymodding.neoforge")
+			"fabric" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom")
+			"neoforge" -> target.pluginManager.apply("dev.pandasystems.easymodding.moddev")
 			null -> {} // Ignore
-			else -> throw IllegalArgumentException("Unknown platform: $platform (Available: fabric, neoforge)")
+			else -> throw IllegalArgumentException("Unknown platform: $platform (Available: loom, moddev)")
 		}
 
 		val generateFabricMetadata =
-			target.tasks.register("GenerateFabricResources	", GenerateFabricResourcesTask::class.java) {
+			target.tasks.register("GenerateFabricResources", GenerateFabricResourcesTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
 				outputDir.convention(target.layout.buildDirectory.dir("generated/easy-modding/fabric/resources"))
 				onlyIf { easyModdingExtension.fabric.enabled.get() }

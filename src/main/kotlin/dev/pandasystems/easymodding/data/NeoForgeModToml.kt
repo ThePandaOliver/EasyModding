@@ -1,7 +1,6 @@
 package dev.pandasystems.easymodding.data
 
 import com.akuleshov7.ktoml.Toml
-import dev.pandasystems.easymodding.EasyModdingConfig
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -168,7 +167,7 @@ object NeoForgeDependencySideSerializer : KSerializer<NeoForgeDependencySide> {
 	}
 }
 
-fun EasyModdingConfig.populateNeoForgeModToml(): NeoForgeModToml {
+internal fun EasyModdingConfig.populateNeoForgeModToml(): NeoForgeModToml {
 	return neoforge.copy(
 		license = neoforge.license ?: metadata.license,
 		mods = neoforge.mods ?: listOf(
@@ -185,7 +184,7 @@ fun EasyModdingConfig.populateNeoForgeModToml(): NeoForgeModToml {
 	)
 }
 
-fun NeoForgeModToml.toTomlString(): String {
+internal fun NeoForgeModToml.toTomlString(): String {
 	val tomlFormat = Toml()
 	return tomlFormat.encodeToString(this)
 }

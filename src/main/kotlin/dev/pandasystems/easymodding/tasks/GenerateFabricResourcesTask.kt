@@ -1,6 +1,6 @@
 package dev.pandasystems.easymodding.tasks
 
-import dev.pandasystems.easymodding.loadEasyModdingConfig
+import dev.pandasystems.easymodding.data.loadEasyModdingConfig
 import dev.pandasystems.easymodding.data.populateFabricModJson
 import dev.pandasystems.easymodding.data.toJsonString
 import org.gradle.api.DefaultTask

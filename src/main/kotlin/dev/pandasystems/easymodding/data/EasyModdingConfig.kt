@@ -1,8 +1,7 @@
-package dev.pandasystems.easymodding
+package dev.pandasystems.easymodding.data
 
-import dev.pandasystems.easymodding.data.FabricModJson
-import dev.pandasystems.easymodding.data.NeoForgeModToml
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -27,6 +26,7 @@ data class EasyModdingConfig(
 	val mixins: List<String>? = null,
 	val fabric: FabricModJson = FabricModJson(),
 	val neoforge: NeoForgeModToml = NeoForgeModToml(),
+	val pack: EasyModdingPack? = null,
 )
 
 @Serializable
@@ -40,6 +40,17 @@ data class EasyModdingMetadata(
 	val authors: List<EasyModdingPerson>? = null,
 	val contributors: List<EasyModdingPerson>? = null,
 	val contact: EasyModdingContact? = null,
+)
+
+@Serializable
+data class EasyModdingPack(
+	val description: String? = null,
+	@SerialName("pack_format")
+	val packFormat: Float? = null,
+	@SerialName("min_format")
+	val minFormat: Float? = null,
+	@SerialName("max_format")
+	val maxFormat: Float? = null,
 )
 
 @Serializable(with = EasyModdingPersonSerializer::class)
@@ -75,7 +86,7 @@ object EasyModdingPersonSerializer : KSerializer<EasyModdingPerson> {
 	}
 }
 
-fun loadEasyModdingConfig(file: File): EasyModdingConfig {
+internal fun loadEasyModdingConfig(file: File): EasyModdingConfig {
 	val json = Json {
 		ignoreUnknownKeys = true
 		explicitNulls = false

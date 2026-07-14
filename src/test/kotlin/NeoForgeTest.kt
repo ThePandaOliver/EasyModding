@@ -32,8 +32,7 @@ class NeoForgeTest {
 		}
 
 		(project as DefaultProject).evaluate()
-		val task = project.tasks.getByName<GenerateNeoForgeResourcesTask>("generateNeoForgeMetadata")
+		val task = project.tasks.getByName<GenerateNeoForgeResourcesTask>("GenerateNeoForgeResources")
 		task.run()
-		println(task.outputDir.get().asFile.readText(Charsets.UTF_8))
 	}
 }

@@ -28,8 +28,7 @@ class FabricTest {
 		}
 
 		(project as DefaultProject).evaluate()
-		val task = project.tasks.getByName<GenerateFabricResourcesTask>("generateFabricMetadata")
+		val task = project.tasks.getByName<GenerateFabricResourcesTask>("GenerateFabricResources")
 		task.run()
-		println(task.outputDir.get().asFile.readText(Charsets.UTF_8))
 	}
 }
