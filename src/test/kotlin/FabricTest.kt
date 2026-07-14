@@ -1,17 +1,11 @@
-import dev.pandasystems.easymodding.EasyModdingExtension
-import dev.pandasystems.easymodding.loadEasyModdingConfig
-import dev.pandasystems.easymodding.tasks.GenerateFabricMetadataTask
-import dev.pandasystems.easymodding.loader.fabric.populateFabricModJson
-import dev.pandasystems.easymodding.loader.fabric.toJsonString
-import kotlinx.serialization.json.*
+import dev.pandasystems.easymodding.extensions.EasyModdingExtension
+import dev.pandasystems.easymodding.tasks.GenerateFabricResourcesTask
 import org.gradle.api.internal.project.DefaultProject
-import org.gradle.internal.extensions.core.extra
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class FabricTest {
 	@Test
@@ -34,8 +28,8 @@ class FabricTest {
 		}
 
 		(project as DefaultProject).evaluate()
-		val task = project.tasks.getByName<GenerateFabricMetadataTask>("generateFabricMetadata")
+		val task = project.tasks.getByName<GenerateFabricResourcesTask>("generateFabricMetadata")
 		task.run()
-		println(task.outputFile.get().asFile.readText(Charsets.UTF_8))
+		println(task.outputDir.get().asFile.readText(Charsets.UTF_8))
 	}
 }

@@ -1,7 +1,8 @@
 package dev.pandasystems.easymodding
 
-import dev.pandasystems.easymodding.tasks.GenerateFabricMetadataTask
-import dev.pandasystems.easymodding.tasks.GenerateNeoForgeMetadataTask
+import dev.pandasystems.easymodding.extensions.EasyModdingExtension
+import dev.pandasystems.easymodding.tasks.GenerateFabricResourcesTask
+import dev.pandasystems.easymodding.tasks.GenerateNeoForgeResourcesTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -22,16 +23,16 @@ class EasyModdingPlugin : Plugin<Project> {
 		}
 
 		val generateFabricMetadata =
-			target.tasks.register("generateFabricMetadata", GenerateFabricMetadataTask::class.java) {
+			target.tasks.register("GenerateFabricResources	", GenerateFabricResourcesTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
-				outputFile.convention(target.layout.buildDirectory.file("generated/easy-modding/metadata/fabric.mod.json"))
+				outputDir.convention(target.layout.buildDirectory.dir("generated/easy-modding/fabric/resources"))
 				onlyIf { easyModdingExtension.fabric.enabled.get() }
 			}
 
 		val generateNeoForgeMetadata =
-			target.tasks.register("generateNeoForgeMetadata", GenerateNeoForgeMetadataTask::class.java) {
+			target.tasks.register("GenerateNeoForgeResources", GenerateNeoForgeResourcesTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
-				outputFile.convention(target.layout.buildDirectory.file("generated/easy-modding/metadata/neoforge.mod.toml"))
+				outputDir.convention(target.layout.buildDirectory.dir("generated/easy-modding/neoforge/resources"))
 				onlyIf { easyModdingExtension.neoForge.enabled.get() }
 			}
 

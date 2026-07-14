@@ -1,8 +1,7 @@
-package dev.pandasystems.easymodding.loader.fabric
+package dev.pandasystems.easymodding.extensions
 
-import dev.pandasystems.easymodding.loader.LoaderExtension
+import dev.pandasystems.easymodding.platform.LoaderExtension
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 

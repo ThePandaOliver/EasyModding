@@ -1,4 +1,4 @@
-package dev.pandasystems.easymodding.loader.neoforge
+package dev.pandasystems.easymodding.data
 
 import com.akuleshov7.ktoml.Toml
 import dev.pandasystems.easymodding.EasyModdingConfig

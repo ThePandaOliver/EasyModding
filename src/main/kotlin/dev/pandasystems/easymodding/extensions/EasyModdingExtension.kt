@@ -1,7 +1,5 @@
-package dev.pandasystems.easymodding
+package dev.pandasystems.easymodding.extensions
 
-import dev.pandasystems.easymodding.loader.fabric.FabricExtension
-import dev.pandasystems.easymodding.loader.neoforge.NeoForgeExtension
 import org.gradle.api.Action
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory

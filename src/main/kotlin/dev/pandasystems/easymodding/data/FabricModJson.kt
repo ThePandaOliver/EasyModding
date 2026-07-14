@@ -1,4 +1,4 @@
-package dev.pandasystems.easymodding.loader.fabric
+package dev.pandasystems.easymodding.data
 
 import dev.pandasystems.easymodding.EasyModdingConfig
 import kotlinx.serialization.KSerializer

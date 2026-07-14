@@ -1,4 +1,4 @@
-import dev.pandasystems.easymodding.EasyModdingExtension
+import dev.pandasystems.easymodding.extensions.EasyModdingExtension
 import org.gradle.api.internal.project.DefaultProject
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.io.TempDir

@@ -1,7 +1,7 @@
 package dev.pandasystems.easymodding
 
-import dev.pandasystems.easymodding.loader.fabric.FabricModJson
-import dev.pandasystems.easymodding.loader.neoforge.NeoForgeModToml
+import dev.pandasystems.easymodding.data.FabricModJson
+import dev.pandasystems.easymodding.data.NeoForgeModToml
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
