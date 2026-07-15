@@ -23,14 +23,14 @@ class EasyModdingPlugin : Plugin<Project> {
 		}
 
 		val generateFabricMetadata =
-			target.tasks.register("GenerateFabricResources", GenerateFabricResourcesTask::class.java) {
+			target.tasks.register("generateFabricResources", GenerateFabricResourcesTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
 				outputDir.convention(target.layout.buildDirectory.dir("generated/easy-modding/fabric/resources"))
 				onlyIf { easyModdingExtension.fabric.enabled.get() }
 			}
 
 		val generateNeoForgeMetadata =
-			target.tasks.register("GenerateNeoForgeResources", GenerateNeoForgeResourcesTask::class.java) {
+			target.tasks.register("generateNeoForgeResources", GenerateNeoForgeResourcesTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
 				outputDir.convention(target.layout.buildDirectory.dir("generated/easy-modding/neoforge/resources"))
 				onlyIf { easyModdingExtension.neoForge.enabled.get() }
