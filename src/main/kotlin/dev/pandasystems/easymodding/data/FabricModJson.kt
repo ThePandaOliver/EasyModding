@@ -17,6 +17,13 @@ import kotlinx.serialization.json.put
 
 // Reference: https://docs.fabricmc.net/develop/loader/fabric-mod-json
 
+/**
+ * Data model of Fabric's `fabric.mod.json` mod metadata file.
+ *
+ * Doubles as the `fabric` section of `easymodding.mod.json` (allowing Fabric-specific overrides)
+ * and as the output model that is serialized to the final `fabric.mod.json`. See the Fabric docs
+ * linked above for the meaning of each field.
+ */
 @Serializable
 data class FabricModJson(
 	val schemaVersion: Int = 1,
@@ -46,16 +53,22 @@ data class FabricModJson(
 	val conflicts: Map<String, String>? = null,
 )
 
+/** A nested (jar-in-jar) jar entry within `fabric.mod.json`. */
 @Serializable
 data class FabricJarEntry(val file: String)
 
 
+/**
+ * A Fabric author/contributor. Serialized via [FabricPersonSerializer] as either a bare string or
+ * a `{ name, contact }` object depending on whether [contact] is present.
+ */
 @Serializable(with = FabricPersonSerializer::class)
 data class FabricPerson(
 	val name: String,
 	val contact: Map<String, String>? = null,
 )
 
+/** Custom serializer emitting a Fabric person as a bare string or a `{ name, contact }` object. */
 object FabricPersonSerializer : KSerializer<FabricPerson> {
 	override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
 
@@ -83,12 +96,17 @@ object FabricPersonSerializer : KSerializer<FabricPerson> {
 	}
 }
 
+/**
+ * A Fabric mixin config entry. Serialized via [FabricMixinEntrySerializer] as a bare string when
+ * there is no [environment], or a `{ config, environment }` object otherwise.
+ */
 @Serializable(with = FabricMixinEntrySerializer::class)
 data class FabricMixinEntry(
 	val config: String,
 	val environment: String? = null,
 )
 
+/** Custom serializer emitting a mixin entry as a bare string or `{ config, environment }` object. */
 object FabricMixinEntrySerializer : KSerializer<FabricMixinEntry> {
 	override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
 
@@ -116,6 +134,11 @@ object FabricMixinEntrySerializer : KSerializer<FabricMixinEntry> {
 	}
 }
 
+/**
+ * Builds the final [FabricModJson] by merging the shared [EasyModdingConfig.metadata] into the
+ * Fabric-specific section. Fabric-specific values take precedence; where absent, the shared
+ * metadata is used as a fallback.
+ */
 internal fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
 	return fabric.copy(
 		id = fabric.id ?: metadata.id,
@@ -131,6 +154,7 @@ internal fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
 	)
 }
 
+/** Serializes this [FabricModJson] to a pretty-printed JSON string for writing to disk. */
 internal fun FabricModJson.toJsonString(): String {
 	val jsonFormat = Json {
 		ignoreUnknownKeys = true

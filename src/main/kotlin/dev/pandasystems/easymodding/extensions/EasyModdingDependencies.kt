@@ -3,13 +3,32 @@ package dev.pandasystems.easymodding.extensions
 import org.gradle.api.Project
 import javax.inject.Inject
 
+/**
+ * Unified, cross-platform dependency declaration API (`easyModding { dependencies { } }`).
+ *
+ * The whole point of this class is to let a mod author write a single set of dependency
+ * declarations that map to the correct loader-specific Gradle configurations regardless of the
+ * target platform. For example [modImplementation] maps to Loom's `modImplementation` on Fabric
+ * but to plain `implementation` on NeoForge/Forge.
+ *
+ * The active [platform] is detected lazily by inspecting which loader plugin has been applied, so
+ * these methods must be called after the platform sub-plugin is applied (which the main plugin
+ * guarantees when `easy_modding.platform` is set). If no supported loader is detected the mod-*
+ * and include-* methods throw a descriptive [IllegalStateException].
+ */
 abstract class EasyModdingDependencies @Inject constructor(
 	private val project: Project
 ) {
+	/** The loaders whose Gradle configuration names this API knows how to map to. */
 	private enum class Platform {
 		FABRIC, NEOFORGE, FORGE, UNKNOWN
 	}
 
+	/**
+	 * Detects the active platform from the applied Gradle plugins. Evaluated lazily so detection
+	 * happens the first time a dependency method is invoked, by which point the loader plugin has
+	 * been applied.
+	 */
 	private val platform: Platform by lazy {
 		when {
 			project.pluginManager.hasPlugin("net.fabricmc.fabric-loom") -> Platform.FABRIC
@@ -94,8 +113,9 @@ abstract class EasyModdingDependencies @Inject constructor(
 	/**
 	 * Adds a non-mod library dependency that will be available at compile time and runtime.
 	 * This is for regular Java/Kotlin libraries that are not mods.
-	 * 
-	 * Use `includeLibrary()` if you want to bundle this library with your mod.
+	 *
+	 * Uses the standard `implementation` configuration on every platform. Note this does NOT bundle
+	 * the library into the output jar; use [includeLibrary] if you want jar-in-jar bundling.
 	 */
 	fun library(notation: Any) {
 		project.dependencies.add("implementation", notation)
@@ -167,14 +187,16 @@ abstract class EasyModdingDependencies @Inject constructor(
 	}
 
 	/**
-	 * Adds a library dependency that will be available only at compile time.
+	 * Adds a non-mod library dependency that will be available only at compile time.
+	 * Uses the standard `compileOnly` configuration on every platform.
 	 */
 	fun libraryCompileOnly(notation: Any) {
 		project.dependencies.add("compileOnly", notation)
 	}
 
 	/**
-	 * Adds a library dependency that will be available only at runtime.
+	 * Adds a non-mod library dependency that will be available only at runtime.
+	 * Uses the standard `runtimeOnly` configuration on every platform.
 	 */
 	fun libraryRuntimeOnly(notation: Any) {
 		project.dependencies.add("runtimeOnly", notation)

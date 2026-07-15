@@ -11,6 +11,13 @@ import kotlinx.serialization.json.JsonPrimitive
 
 // Reference: https://docs.neoforged.net/docs/gettingstarted/modfiles/
 
+/**
+ * Data model of NeoForge's `neoforge.mods.toml` mod metadata file.
+ *
+ * Doubles as the `neoforge` section of `easymodding.mod.json` (for NeoForge-specific overrides)
+ * and as the output model serialized to the final `neoforge.mods.toml`. See the NeoForge docs
+ * linked above for field semantics.
+ */
 @Serializable
 data class NeoForgeModToml(
 	val modLoader: String? = null,
@@ -30,6 +37,7 @@ data class NeoForgeModToml(
 	val dependencies: List<NeoForgeDependency>? = null
 )
 
+/** A single `[[mods]]` entry in `neoforge.mods.toml` describing one mod in the jar. */
 @Serializable
 data class NeoForgeMod(
 	val modId: String? = null,
@@ -48,11 +56,13 @@ data class NeoForgeMod(
 	val featureFlags: String? = null
 )
 
+/** An access transformer file declaration. */
 @Serializable
 data class NeoForgeAccessTransformer(
 	val file: String? = null,
 )
 
+/** A mixin config declaration for NeoForge. */
 @Serializable
 data class NeoForgeMixin(
 	val config: String? = null,
@@ -60,6 +70,7 @@ data class NeoForgeMixin(
 	val behaviorVersion: String? = null
 )
 
+/** A mod dependency declaration with its type, version range, load ordering and side. */
 @Serializable
 data class NeoForgeDependency(
 	val modId: String? = null,
@@ -71,6 +82,7 @@ data class NeoForgeDependency(
 	val referralUrl: String? = null
 )
 
+/** How strictly a dependency is required. Serialized lowercase (e.g. `required`). */
 @Serializable(NeoForgeDependencyTypeSerializer::class)
 enum class NeoForgeDependencyType {
 	Required,
@@ -79,6 +91,7 @@ enum class NeoForgeDependencyType {
 	Discouraged
 }
 
+/** Maps [NeoForgeDependencyType] to/from its lowercase TOML string representation. */
 object NeoForgeDependencyTypeSerializer : KSerializer<NeoForgeDependencyType> {
 	override val descriptor: SerialDescriptor = JsonPrimitive.serializer().descriptor
 
@@ -105,6 +118,7 @@ object NeoForgeDependencyTypeSerializer : KSerializer<NeoForgeDependencyType> {
 	}
 }
 
+/** Load ordering of this mod relative to a dependency. Serialized uppercase (e.g. `BEFORE`). */
 @Serializable(NeoForgeDependencyOrderingSerializer::class)
 enum class NeoForgeDependencyOrdering {
 	Before,
@@ -112,6 +126,7 @@ enum class NeoForgeDependencyOrdering {
 	None
 }
 
+/** Maps [NeoForgeDependencyOrdering] to/from its uppercase TOML string representation. */
 object NeoForgeDependencyOrderingSerializer : KSerializer<NeoForgeDependencyOrdering> {
 	override val descriptor: SerialDescriptor = JsonPrimitive.serializer().descriptor
 
@@ -136,6 +151,7 @@ object NeoForgeDependencyOrderingSerializer : KSerializer<NeoForgeDependencyOrde
 	}
 }
 
+/** Which physical side a dependency applies to. Serialized uppercase (e.g. `BOTH`). */
 @Serializable(NeoForgeDependencySideSerializer::class)
 enum class NeoForgeDependencySide {
 	Client,
@@ -143,6 +159,7 @@ enum class NeoForgeDependencySide {
 	Both
 }
 
+/** Maps [NeoForgeDependencySide] to/from its uppercase TOML string representation. */
 object NeoForgeDependencySideSerializer : KSerializer<NeoForgeDependencySide> {
 	override val descriptor: SerialDescriptor = JsonPrimitive.serializer().descriptor
 
@@ -167,6 +184,11 @@ object NeoForgeDependencySideSerializer : KSerializer<NeoForgeDependencySide> {
 	}
 }
 
+/**
+ * Builds the final [NeoForgeModToml] by merging the shared [EasyModdingConfig.metadata] into the
+ * NeoForge-specific section. If no explicit `mods` list is provided, a single [NeoForgeMod] is
+ * synthesized from the shared metadata.
+ */
 internal fun EasyModdingConfig.populateNeoForgeModToml(): NeoForgeModToml {
 	return neoforge.copy(
 		license = neoforge.license ?: metadata.license,
@@ -184,6 +206,7 @@ internal fun EasyModdingConfig.populateNeoForgeModToml(): NeoForgeModToml {
 	)
 }
 
+/** Serializes this [NeoForgeModToml] to a TOML string (via ktoml) for writing to disk. */
 internal fun NeoForgeModToml.toTomlString(): String {
 	val tomlFormat = Toml()
 	return tomlFormat.encodeToString(this)

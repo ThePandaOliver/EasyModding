@@ -17,18 +17,38 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import java.io.File
 
+/** A map of contact keys (e.g. `homepage`, `issues`) to their URLs/values. */
 typealias EasyModdingContact = Map<String, String>
 
+/**
+ * The unified, loader-agnostic mod configuration, deserialized from `easymodding.mod.json`.
+ *
+ * This is the single source of truth for a mod's metadata. At build time it is transformed into
+ * the various loader-native metadata files:
+ *  - [metadata] + [fabric] -> `fabric.mod.json`
+ *  - [metadata] + [neoforge] -> `neoforge.mods.toml`
+ *  - [pack] -> `pack.mcmeta`
+ *
+ * The shared [metadata] is used as a fallback for loader-specific sections, so common fields only
+ * need to be declared once. Loader-specific sections may override or extend those values.
+ */
 @Serializable
 data class EasyModdingConfig(
+	/** Config schema version, for forward compatibility. */
 	val schemaVersion: Int = 1,
+	/** Shared metadata common to all loaders. */
 	val metadata: EasyModdingMetadata,
+	/** Mixin config file names shared across loaders. */
 	val mixins: List<String>? = null,
+	/** Fabric-specific overrides/extensions, merged over [metadata]. */
 	val fabric: FabricModJson = FabricModJson(),
+	/** NeoForge-specific overrides/extensions, merged over [metadata]. */
 	val neoforge: NeoForgeModToml = NeoForgeModToml(),
+	/** Resource/data pack format info used to generate `pack.mcmeta`. */
 	val pack: EasyModdingPack? = null,
 )
 
+/** Loader-agnostic mod metadata shared by every generated metadata file. */
 @Serializable
 data class EasyModdingMetadata(
 	val id: String,
@@ -42,6 +62,10 @@ data class EasyModdingMetadata(
 	val contact: EasyModdingContact? = null,
 )
 
+/**
+ * Pack format info for `pack.mcmeta`. Supports either the legacy single [packFormat] or the modern
+ * [minFormat]/[maxFormat] range; see [PackMcmeta] for how these are normalized on output.
+ */
 @Serializable
 data class EasyModdingPack(
 	val description: String? = null,
@@ -53,12 +77,22 @@ data class EasyModdingPack(
 	val maxFormat: Float? = null,
 )
 
+/**
+ * A person (author or contributor) associated with the mod.
+ *
+ * Serialized via [EasyModdingPersonSerializer] to match the loader convention of writing a bare
+ * string when there is no [contact] info, or an object with `name`/`contact` when there is.
+ */
 @Serializable(with = EasyModdingPersonSerializer::class)
 data class EasyModdingPerson(
 	val name: String,
 	val contact: EasyModdingContact? = null
 )
 
+/**
+ * Custom serializer for [EasyModdingPerson] that reads/writes either a bare JSON string
+ * (`"Some Name"`) or a full object (`{ "name": ..., "contact": { ... } }`).
+ */
 object EasyModdingPersonSerializer : KSerializer<EasyModdingPerson> {
 	override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
 
@@ -86,6 +120,7 @@ object EasyModdingPersonSerializer : KSerializer<EasyModdingPerson> {
 	}
 }
 
+/** Reads and parses an `easymodding.mod.json` file into an [EasyModdingConfig]. */
 internal fun loadEasyModdingConfig(file: File): EasyModdingConfig {
 	val json = Json {
 		ignoreUnknownKeys = true

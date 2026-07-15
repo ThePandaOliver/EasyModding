@@ -17,12 +17,21 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
+/**
+ * Gradle task that generates the NeoForge metadata from the unified `easymodding.mod.json`.
+ *
+ * Writes `META-INF/neoforge.mods.toml` and `META-INF/pack.mcmeta`. Registered as
+ * `generateNeoForgeResources` by [dev.pandasystems.easymodding.EasyModdingPlugin] and hooked into
+ * `processResources`. It is cacheable and only re-runs when the input config changes.
+ */
 @CacheableTask
 abstract class GenerateNeoForgeResourcesTask : DefaultTask() {
+    /** The unified config file (`easymodding.mod.json`) to read from. */
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val configFile: RegularFileProperty
 
+    /** The directory into which the generated `META-INF` metadata files are written. */
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
