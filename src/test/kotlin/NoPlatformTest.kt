@@ -23,6 +23,7 @@ class NoPlatformTest {
 
 			neoForge()
 			fabric()
+			forge()
 		}
 
 		(project as DefaultProject).evaluate()

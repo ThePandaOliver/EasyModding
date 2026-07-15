@@ -45,6 +45,9 @@ abstract class EasyModdingExtension @Inject constructor(
 	/** NeoForge loader configuration block (`neoForge { }`). */
 	val neoForge = objects.newInstance(NeoForgeExtension::class.java)
 
+	/** Forge loader configuration block (`forge { }`). */
+	val forge = objects.newInstance(ForgeExtension::class.java)
+
 	/** The unified, cross-platform dependency declaration container (`dependencies { }`). */
 	val dependencies = objects.newInstance(EasyModdingDependencies::class.java)
 
@@ -69,6 +72,15 @@ abstract class EasyModdingExtension @Inject constructor(
 
 	/** Enables the NeoForge loader with default configuration. */
 	fun neoForge() = neoForge.enabled.set(true)
+
+	/** Enables the Forge loader and configures it via the supplied [action]. */
+	fun forge(action: Action<ForgeExtension>) {
+		forge.enabled.set(true)
+		action.execute(forge)
+	}
+
+	/** Enables the Forge loader with default configuration. */
+	fun forge() = forge.enabled.set(true)
 
 	/** Declares cross-platform dependencies via the [EasyModdingDependencies] API. */
 	fun dependencies(action: Action<EasyModdingDependencies>) {

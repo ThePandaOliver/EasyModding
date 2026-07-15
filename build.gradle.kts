@@ -11,6 +11,7 @@ repositories {
 	mavenCentral()
 	gradlePluginPortal()
 	maven("https://maven.fabricmc.net/")
+	maven("https://maven.minecraftforge.net/")
 }
 
 dependencies {
@@ -24,6 +25,7 @@ dependencies {
 
 	implementPlugin("net.fabricmc.fabric-loom", "1.17-SNAPSHOT")
 	implementPlugin("net.neoforged.moddev", "2.0.141")
+	implementPlugin("net.minecraftforge.gradle", "[7.0.17,8)")
 }
 
 kotlin {
@@ -47,6 +49,10 @@ gradlePlugin {
 		register("easy-modding-moddev") {
 			id = "dev.pandasystems.easymodding.moddev"
 			implementationClass = "dev.pandasystems.easymodding.platform.moddev.EasyModdingModdevPlugin"
+		}
+		register("easy-modding-forgegradle") {
+			id = "dev.pandasystems.easymodding.forgegradle"
+			implementationClass = "dev.pandasystems.easymodding.platform.forgegradle.EasyModdingForgeGradlePlugin"
 		}
 	}
 }

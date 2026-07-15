@@ -1,9 +1,9 @@
 # EasyModding
 
 A Gradle plugin that makes **Minecraft multiloader modding** easier by unifying the build scripts
-into a single plugin. It sets up your project based on the selected loader (Fabric or NeoForge) and
-generates the required loader metadata files (`fabric.mod.json`, `neoforge.mods.toml`,
-`pack.mcmeta`) from **one shared config file**.
+into a single plugin. It sets up your project based on the selected loader (Fabric, NeoForge, or
+Forge) and generates the required loader metadata files (`fabric.mod.json`, `neoforge.mods.toml`,
+`mods.toml`, `pack.mcmeta`) from **one shared config file**.
 
 Instead of maintaining separate build scripts and metadata files per loader, you declare your mod
 once and switch platforms with a single Gradle property.
@@ -11,7 +11,7 @@ once and switch platforms with a single Gradle property.
 ## Features
 
 - **Unified build setup** — one plugin applies and configures the correct loader toolchain (Fabric
-  Loom or NeoForged ModDev) based on the selected platform.
+  Loom, NeoForged ModDev, or ForgeGradle) based on the selected platform.
 - **Single source of truth for metadata** — describe your mod once in `easymodding.mod.json`, and
   EasyModding generates the loader-native files at build time.
 - **Unified dependency API** — declare dependencies once with methods like `modImplementation`,
@@ -38,8 +38,9 @@ Select the target loader in `gradle.properties`:
 
 ```properties
 # Choose one:
-easy_modding.platform=fabric
-# easy_modding.platform=neoforge
+easy_modding.platform=loom
+# easy_modding.platform=moddev
+# easy_modding.platform=forgegradle
 ```
 
 When no platform is set, EasyModding skips loader-specific wiring — useful for a shared/common
@@ -59,6 +60,11 @@ easyModding {
     // ...or NeoForge:
     // neoForge {
     //     neoForgeVersion.set("21.1.0")
+    // }
+
+    // ...or legacy Forge:
+    // forge {
+    //     forgeVersion.set("47.2.0")
     // }
 
     dependencies {
@@ -105,12 +111,13 @@ The shared `metadata` block is used as the fallback for every loader. Loader-spe
 
 ### 3. Build
 
-`fabric.mod.json` / `neoforge.mods.toml` / `pack.mcmeta` are generated automatically as part of
-`processResources`. You can also run the generation tasks directly:
+`fabric.mod.json` / `neoforge.mods.toml` / `mods.toml` / `pack.mcmeta` are generated automatically
+as part of `processResources`. You can also run the generation tasks directly:
 
 ```bash
 ./gradlew generateFabricResources     # when Fabric is enabled
 ./gradlew generateNeoForgeResources   # when NeoForge is enabled
+./gradlew generateForgeResources      # when Forge is enabled
 ```
 
 ## Unified dependency API
@@ -164,14 +171,16 @@ easyModding {
 EasyModding is a thin orchestrator plugin backed by loader-specific sub-plugins:
 
 ```
-dev.pandasystems.easymodding          (main entry point)
-├── dev.pandasystems.easymodding.loom     -> Fabric Loom
-└── dev.pandasystems.easymodding.moddev   -> NeoForged ModDev
+dev.pandasystems.easymodding                (main entry point)
+├── dev.pandasystems.easymodding.loom          -> Fabric Loom          (platform = "loom")
+├── dev.pandasystems.easymodding.moddev        -> NeoForged ModDev     (platform = "moddev")
+└── dev.pandasystems.easymodding.forgegradle   -> ForgeGradle          (platform = "forgegradle")
 ```
 
-1. The main plugin reads `easy_modding.platform` and applies the matching sub-plugin.
-2. The sub-plugin applies the underlying loader plugin and wires up the Minecraft / NeoForge
-   version from the `easyModding` extension.
+1. The main plugin reads `easy_modding.platform` (`loom`, `moddev`, or `forgegradle`) and applies
+   the matching sub-plugin.
+2. The sub-plugin applies the underlying loader plugin and wires up the Minecraft / NeoForge /
+   Forge version from the `easyModding` extension.
 3. Resource-generation tasks read `easymodding.mod.json` and write the loader-native metadata
    files, which are folded into `processResources`.
 
@@ -184,21 +193,24 @@ src/main/kotlin/dev/pandasystems/easymodding/
 │   ├── EasyModdingConfig.kt      Unified config model (easymodding.mod.json)
 │   ├── FabricModJson.kt          fabric.mod.json model + population/serialization
 │   ├── NeoForgeModToml.kt        neoforge.mods.toml model + population/serialization
+│   ├── ForgeModsToml.kt          mods.toml model + population/serialization (Forge's own schema)
 │   └── PackMcmeta.kt             pack.mcmeta model + population/serialization
 ├── extensions/                   The easyModding { } DSL
 │   ├── EasyModdingExtension.kt   Root DSL (minecraftVersion, configPath, loaders, deps)
 │   ├── EasyModdingDependencies.kt Unified cross-platform dependency API
 │   ├── LoaderExtension.kt        Common loader interface (enabled flag)
 │   ├── FabricExtension.kt        Fabric loader config
-│   └── NeoForgeExtension.kt      NeoForge loader config (+ neoForgeVersion)
+│   ├── NeoForgeExtension.kt      NeoForge loader config (+ neoForgeVersion)
+│   └── ForgeExtension.kt         Forge loader config (+ forgeVersion)
 ├── platform/                     Loader-specific sub-plugins
 │   ├── BaseEasyModdingPlatformPlugin.kt
-│   ├── loom/EasyModdingLoomPlugin.kt        Fabric (Loom)
-│   ├── moddev/EasyModdingModdevPlugin.kt    NeoForge (ModDev)
-│   └── forgegradle/EasyModdingForgeGradlePlugin.kt  Forge (WIP, not registered)
+│   ├── loom/EasyModdingLoomPlugin.kt                Fabric (Loom)
+│   ├── moddev/EasyModdingModdevPlugin.kt            NeoForge (ModDev)
+│   └── forgegradle/EasyModdingForgeGradlePlugin.kt  Forge (ForgeGradle)
 └── tasks/                        Metadata generation tasks
     ├── GenerateFabricResourcesTask.kt
-    └── GenerateNeoForgeResourcesTask.kt
+    ├── GenerateNeoForgeResourcesTask.kt
+    └── GenerateForgeResourcesTask.kt
 ```
 
 ## Building the plugin
@@ -211,11 +223,11 @@ src/main/kotlin/dev/pandasystems/easymodding/
 
 ## Status & roadmap
 
-- **Fabric (Loom)** — supported.
-- **NeoForge (ModDev)** — supported.
-- **Forge (ForgeGradle)** — work in progress. The `EasyModdingForgeGradlePlugin` exists but is not
-  yet registered as a usable Gradle plugin; Minecraft/Forge dependency wiring is still a TODO and
-  will likely need an additional `forgeVersion` property on the extension.
+- **Fabric (`loom`)** — supported.
+- **NeoForge (`moddev`)** — supported.
+- **Forge (`forgegradle`)** — supported, backed by ForgeGradle 7 (`[7.0.17,8)`), which requires
+  Gradle 9+ and uses the newer `minecraft.dependency(...)` API instead of the legacy `minecraft`
+  dependency configuration used by ForgeGradle 6.
 
 ## License
 

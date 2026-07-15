@@ -27,6 +27,7 @@ typealias EasyModdingContact = Map<String, String>
  * the various loader-native metadata files:
  *  - [metadata] + [fabric] -> `fabric.mod.json`
  *  - [metadata] + [neoforge] -> `neoforge.mods.toml`
+ *  - [metadata] + [forge] -> `mods.toml`
  *  - [pack] -> `pack.mcmeta`
  *
  * The shared [metadata] is used as a fallback for loader-specific sections, so common fields only
@@ -44,6 +45,11 @@ data class EasyModdingConfig(
 	val fabric: FabricModJson = FabricModJson(),
 	/** NeoForge-specific overrides/extensions, merged over [metadata]. */
 	val neoforge: NeoForgeModToml = NeoForgeModToml(),
+	/**
+	 * Legacy Forge-specific overrides/extensions, merged over [metadata]. Note this uses its own
+	 * [ForgeModsToml] schema, which is similar to but not identical to [neoforge]'s.
+	 */
+	val forge: ForgeModsToml = ForgeModsToml(),
 	/** Resource/data pack format info used to generate `pack.mcmeta`. */
 	val pack: EasyModdingPack? = null,
 )

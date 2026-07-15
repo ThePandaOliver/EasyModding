@@ -15,6 +15,8 @@ class FabricTest {
 			.withProjectDir(projectDir)
 			.build()
 
+		// Intentionally does not set `easy_modding.platform`, so the real Loom plugin is never
+		// applied; this test only exercises resource generation, not the loader toolchain wiring.
 		project.repositories.mavenCentral()
 		project.plugins.apply("dev.pandasystems.easymodding")
 
@@ -28,7 +30,7 @@ class FabricTest {
 		}
 
 		(project as DefaultProject).evaluate()
-		val task = project.tasks.getByName<GenerateFabricResourcesTask>("GenerateFabricResources")
+		val task = project.tasks.getByName<GenerateFabricResourcesTask>("generateFabricResources")
 		task.run()
 	}
 }
