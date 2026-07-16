@@ -8,6 +8,9 @@ Forge) and generates the required loader metadata files (`fabric.mod.json`, `neo
 Instead of maintaining separate build scripts and metadata files per loader, you declare your mod
 once and switch platforms with a single Gradle property.
 
+> **Note:** This project was developed with assistance from Agentic AI as an experiment to accelerate
+> development. All code has been reviewed by the developer.
+
 ## Features
 
 - **Unified build setup** — one plugin applies and configures the correct loader toolchain (Fabric
