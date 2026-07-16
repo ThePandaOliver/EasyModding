@@ -24,6 +24,7 @@ dependencies {
 	fun implementPlugin(id: String, version: String) = implementation("$id:$id.gradle.plugin:$version")
 
 	implementPlugin("net.fabricmc.fabric-loom", "1.17-SNAPSHOT")
+	implementPlugin("net.fabricmc.fabric-loom-remap", "1.17-SNAPSHOT")
 	implementPlugin("net.neoforged.moddev", "2.0.141")
 	implementPlugin("net.minecraftforge.gradle", "[7.0.17,8)")
 }
@@ -45,6 +46,10 @@ gradlePlugin {
 		register("easy-modding-loom") {
 			id = "dev.pandasystems.easymodding.loom"
 			implementationClass = "dev.pandasystems.easymodding.platform.loom.EasyModdingLoomPlugin"
+		}
+		register("easy-modding-loom-remap") {
+			id = "dev.pandasystems.easymodding.loom-remap"
+			implementationClass = "dev.pandasystems.easymodding.platform.loom.EasyModdingLoomRemapPlugin"
 		}
 		register("easy-modding-moddev") {
 			id = "dev.pandasystems.easymodding.moddev"

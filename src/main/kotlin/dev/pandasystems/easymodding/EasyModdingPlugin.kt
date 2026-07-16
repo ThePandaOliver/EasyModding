@@ -43,11 +43,12 @@ class EasyModdingPlugin : Plugin<Project> {
 		// Apply the loader-specific sub-plugin based on the selected platform.
 		when (platform) {
 			"loom" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom")
+			"loom-remap" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-remap")
 			"moddev" -> target.pluginManager.apply("dev.pandasystems.easymodding.moddev")
 			"forgegradle" -> target.pluginManager.apply("dev.pandasystems.easymodding.forgegradle")
 			null -> {} // No platform selected: skip loader wiring (e.g. a common/shared module).
 			else -> throw IllegalArgumentException(
-				"Unknown platform: $platform (Available: loom, moddev, forgegradle)"
+				"Unknown platform: $platform (Available: loom, loom-remap, moddev, forgegradle)"
 			)
 		}
 
