@@ -16,9 +16,10 @@ import org.gradle.language.jvm.tasks.ProcessResources
  *
  *  1. Registers the [EasyModdingExtension] (`easyModding { }`) DSL used to configure the mod.
  *  2. Reads the `easy_modding.platform` Gradle property to decide which loader-specific sub-plugin
- *     to apply (`loom` for Fabric Loom, `moddev` for NeoForged ModDev, or `forgegradle` for legacy
- *     Forge). This lets a single set of build scripts target different platforms simply by
- *     switching the property.
+ *     to apply (`loom` for auto-detecting Fabric Loom variant, `loom-noremap` or `loom-remap` for
+ *     explicit Loom variants, `moddev` for NeoForged ModDev, or `forgegradle` for legacy Forge).
+ *     This lets a single set of build scripts target different platforms simply by switching the
+ *     property.
  *  3. Registers the resource-generation tasks that translate the unified `easymodding.mod.json`
  *     config into the loader-native metadata files, and wires them into `processResources` so they
  *     run automatically as part of a normal build.
@@ -43,12 +44,13 @@ class EasyModdingPlugin : Plugin<Project> {
 		// Apply the loader-specific sub-plugin based on the selected platform.
 		when (platform) {
 			"loom" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom")
+			"loom-noremap" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-noremap")
 			"loom-remap" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-remap")
 			"moddev" -> target.pluginManager.apply("dev.pandasystems.easymodding.moddev")
 			"forgegradle" -> target.pluginManager.apply("dev.pandasystems.easymodding.forgegradle")
 			null -> {} // No platform selected: skip loader wiring (e.g. a common/shared module).
 			else -> throw IllegalArgumentException(
-				"Unknown platform: $platform (Available: loom, loom-remap, moddev, forgegradle)"
+				"Unknown platform: $platform (Available: loom, loom-noremap, loom-remap, moddev, forgegradle)"
 			)
 		}
 

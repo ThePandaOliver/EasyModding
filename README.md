@@ -11,7 +11,8 @@ once and switch platforms with a single Gradle property.
 ## Features
 
 - **Unified build setup** — one plugin applies and configures the correct loader toolchain (Fabric
-  Loom, Fabric Loom Remap, NeoForged ModDev, or ForgeGradle) based on the selected platform.
+  Loom with auto-detection, Fabric Loom No-Remap, Fabric Loom Remap, NeoForged ModDev, or
+  ForgeGradle) based on the selected platform.
 - **Single source of truth for metadata** — describe your mod once in `easymodding.mod.json`, and
   EasyModding generates the loader-native files at build time.
 - **Unified dependency API** — declare dependencies once with methods like `modImplementation`,
@@ -38,11 +39,15 @@ Select the target loader in `gradle.properties`:
 
 ```properties
 # Choose one:
-easy_modding.platform=loom
-# easy_modding.platform=loom-remap
-# easy_modding.platform=moddev
-# easy_modding.platform=forgegradle
+easy_modding.platform=loom            # Auto-detects: loom-remap for MC <= 1.21.11, loom-noremap for MC > 1.21.11
+# easy_modding.platform=loom-noremap  # Explicit: Fabric Loom no-remap variant (for MC > 1.21.11)
+# easy_modding.platform=loom-remap    # Explicit: Fabric Loom remap variant with Mojang mappings (for MC <= 1.21.11)
+# easy_modding.platform=moddev        # NeoForge ModDev
+# easy_modding.platform=forgegradle   # Legacy Forge with ForgeGradle
 ```
+
+**Recommended:** Use `loom` for Fabric projects — it automatically selects the appropriate Loom
+variant based on your Minecraft version.
 
 When no platform is set, EasyModding skips loader-specific wiring — useful for a shared/common
 subproject in a split multiloader setup.
@@ -172,18 +177,23 @@ easyModding {
 EasyModding is a thin orchestrator plugin backed by loader-specific sub-plugins:
 
 ```
-dev.pandasystems.easymodding                (main entry point)
-├── dev.pandasystems.easymodding.loom          -> Fabric Loom          (platform = "loom")
-├── dev.pandasystems.easymodding.loom-remap    -> Fabric Loom Remap    (platform = "loom-remap")
-├── dev.pandasystems.easymodding.moddev        -> NeoForged ModDev     (platform = "moddev")
-└── dev.pandasystems.easymodding.forgegradle   -> ForgeGradle          (platform = "forgegradle")
+dev.pandasystems.easymodding                   (main entry point)
+├── dev.pandasystems.easymodding.loom             -> Auto-detecting Loom (platform = "loom")
+│                                                    ├─> loom-remap (MC <= 1.21.11)
+│                                                    └─> loom-noremap (MC > 1.21.11)
+├── dev.pandasystems.easymodding.loom-noremap     -> Fabric Loom No-Remap (platform = "loom-noremap")
+├── dev.pandasystems.easymodding.loom-remap       -> Fabric Loom Remap    (platform = "loom-remap")
+├── dev.pandasystems.easymodding.moddev           -> NeoForged ModDev     (platform = "moddev")
+└── dev.pandasystems.easymodding.forgegradle      -> ForgeGradle          (platform = "forgegradle")
 ```
 
-1. The main plugin reads `easy_modding.platform` (`loom`, `loom-remap`, `moddev`, or `forgegradle`)
-   and applies the matching sub-plugin.
-2. The sub-plugin applies the underlying loader plugin and wires up the Minecraft / NeoForge /
+1. The main plugin reads `easy_modding.platform` (`loom`, `loom-noremap`, `loom-remap`, `moddev`,
+   or `forgegradle`) and applies the matching sub-plugin.
+2. For `loom`, the sub-plugin detects the Minecraft version and automatically applies either
+   `loom-remap` (for versions 1.21.11 and below) or `loom-noremap` (for versions above 1.21.11).
+3. The sub-plugin applies the underlying loader plugin and wires up the Minecraft / NeoForge /
    Forge version from the `easyModding` extension.
-3. Resource-generation tasks read `easymodding.mod.json` and write the loader-native metadata
+4. Resource-generation tasks read `easymodding.mod.json` and write the loader-native metadata
    files, which are folded into `processResources`.
 
 ## Project structure
@@ -206,8 +216,9 @@ src/main/kotlin/dev/pandasystems/easymodding/
 │   └── ForgeExtension.kt         Forge loader config (+ forgeVersion)
 ├── platform/                     Loader-specific sub-plugins
 │   ├── BaseEasyModdingPlatformPlugin.kt
-│   ├── loom/EasyModdingLoomPlugin.kt                Fabric (Loom)
-│   ├── loom/EasyModdingLoomRemapPlugin.kt           Fabric (Loom Remap, Mojang mappings)
+│   ├── loom/EasyModdingLoomPlugin.kt                Fabric (auto-detects Loom variant)
+│   ├── loom/EasyModdingLoomNoremapPlugin.kt         Fabric (Loom no-remap, MC > 1.21.11)
+│   ├── loom/EasyModdingLoomRemapPlugin.kt           Fabric (Loom remap, MC <= 1.21.11)
 │   ├── moddev/EasyModdingModdevPlugin.kt            NeoForge (ModDev)
 │   └── forgegradle/EasyModdingForgeGradlePlugin.kt  Forge (ForgeGradle)
 └── tasks/                        Metadata generation tasks
@@ -226,12 +237,24 @@ src/main/kotlin/dev/pandasystems/easymodding/
 
 ## Status & roadmap
 
-- **Fabric (`loom`)** — supported.
-- **Fabric Loom Remap (`loom-remap`)** — supported. Uses `net.fabricmc.fabric-loom-remap` (same
-  version as `fabric-loom`) and automatically wires in the official Mojang mappings via
-  `loom.officialMojangMappings()`. Use this platform when your project requires remapped output
-  with Mojang's obfuscation mappings rather than Intermediary.
+- **Fabric (`loom`)** — supported with automatic version detection. The plugin automatically selects
+  the appropriate Loom variant based on your Minecraft version:
+  - **Minecraft <= 1.21.11**: Uses `loom-remap` with Mojang mappings
+  - **Minecraft > 1.21.11**: Uses `loom-noremap` (standard Fabric Loom)
+  
+  This is the **recommended** option for Fabric projects as it handles version changes automatically.
+
+- **Fabric Loom No-Remap (`loom-noremap`)** — explicit support for the standard Fabric Loom variant
+  without remapping. Use this if you want to explicitly target Minecraft versions above 1.21.11
+  without auto-detection.
+
+- **Fabric Loom Remap (`loom-remap`)** — explicit support for the remap variant. Uses
+  `net.fabricmc.fabric-loom-remap` (same version as `fabric-loom`) and automatically wires in the
+  official Mojang mappings via `loom.officialMojangMappings()`. Use this if you want to explicitly
+  target Minecraft 1.21.11 or older versions without auto-detection.
+
 - **NeoForge (`moddev`)** — supported.
+
 - **Forge (`forgegradle`)** — supported, backed by ForgeGradle 7 (`[7.0.17,8)`), which requires
   Gradle 9+ and uses the newer `minecraft.dependency(...)` API instead of the legacy `minecraft`
   dependency configuration used by ForgeGradle 6.
