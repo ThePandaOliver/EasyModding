@@ -11,7 +11,7 @@ once and switch platforms with a single Gradle property.
 ## Features
 
 - **Unified build setup** — one plugin applies and configures the correct loader toolchain (Fabric
-  Loom, NeoForged ModDev, or ForgeGradle) based on the selected platform.
+  Loom, Fabric Loom Remap, NeoForged ModDev, or ForgeGradle) based on the selected platform.
 - **Single source of truth for metadata** — describe your mod once in `easymodding.mod.json`, and
   EasyModding generates the loader-native files at build time.
 - **Unified dependency API** — declare dependencies once with methods like `modImplementation`,
@@ -39,6 +39,7 @@ Select the target loader in `gradle.properties`:
 ```properties
 # Choose one:
 easy_modding.platform=loom
+# easy_modding.platform=loom-remap
 # easy_modding.platform=moddev
 # easy_modding.platform=forgegradle
 ```
@@ -173,12 +174,13 @@ EasyModding is a thin orchestrator plugin backed by loader-specific sub-plugins:
 ```
 dev.pandasystems.easymodding                (main entry point)
 ├── dev.pandasystems.easymodding.loom          -> Fabric Loom          (platform = "loom")
+├── dev.pandasystems.easymodding.loom-remap    -> Fabric Loom Remap    (platform = "loom-remap")
 ├── dev.pandasystems.easymodding.moddev        -> NeoForged ModDev     (platform = "moddev")
 └── dev.pandasystems.easymodding.forgegradle   -> ForgeGradle          (platform = "forgegradle")
 ```
 
-1. The main plugin reads `easy_modding.platform` (`loom`, `moddev`, or `forgegradle`) and applies
-   the matching sub-plugin.
+1. The main plugin reads `easy_modding.platform` (`loom`, `loom-remap`, `moddev`, or `forgegradle`)
+   and applies the matching sub-plugin.
 2. The sub-plugin applies the underlying loader plugin and wires up the Minecraft / NeoForge /
    Forge version from the `easyModding` extension.
 3. Resource-generation tasks read `easymodding.mod.json` and write the loader-native metadata
@@ -205,6 +207,7 @@ src/main/kotlin/dev/pandasystems/easymodding/
 ├── platform/                     Loader-specific sub-plugins
 │   ├── BaseEasyModdingPlatformPlugin.kt
 │   ├── loom/EasyModdingLoomPlugin.kt                Fabric (Loom)
+│   ├── loom/EasyModdingLoomRemapPlugin.kt           Fabric (Loom Remap, Mojang mappings)
 │   ├── moddev/EasyModdingModdevPlugin.kt            NeoForge (ModDev)
 │   └── forgegradle/EasyModdingForgeGradlePlugin.kt  Forge (ForgeGradle)
 └── tasks/                        Metadata generation tasks
@@ -224,6 +227,10 @@ src/main/kotlin/dev/pandasystems/easymodding/
 ## Status & roadmap
 
 - **Fabric (`loom`)** — supported.
+- **Fabric Loom Remap (`loom-remap`)** — supported. Uses `net.fabricmc.fabric-loom-remap` (same
+  version as `fabric-loom`) and automatically wires in the official Mojang mappings via
+  `loom.officialMojangMappings()`. Use this platform when your project requires remapped output
+  with Mojang's obfuscation mappings rather than Intermediary.
 - **NeoForge (`moddev`)** — supported.
 - **Forge (`forgegradle`)** — supported, backed by ForgeGradle 7 (`[7.0.17,8)`), which requires
   Gradle 9+ and uses the newer `minecraft.dependency(...)` API instead of the legacy `minecraft`
