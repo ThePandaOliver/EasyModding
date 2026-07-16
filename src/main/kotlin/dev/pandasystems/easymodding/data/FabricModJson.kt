@@ -138,8 +138,13 @@ object FabricMixinEntrySerializer : KSerializer<FabricMixinEntry> {
  * Builds the final [FabricModJson] by merging the shared [EasyModdingConfig.metadata] into the
  * Fabric-specific section. Fabric-specific values take precedence; where absent, the shared
  * metadata is used as a fallback.
+ *
+ * The unified [EasyModdingConfig.dependencies] are bucketed into `depends`/`recommends`/
+ * `conflicts`/`breaks` (see [EasyModdingDependencyType]) and merged with any dependencies declared
+ * directly under `fabric`; on a mod ID clash the explicit `fabric` entry wins.
  */
 internal fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
+	val buckets = dependencies.toFabricDependencyBuckets()
 	return fabric.copy(
 		id = fabric.id ?: metadata.id,
 		version = fabric.version ?: metadata.version,
@@ -151,8 +156,54 @@ internal fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
 		contributors = fabric.contributors ?: metadata.contributors?.map { (name, contact) -> FabricPerson(name, contact) },
 		contact = fabric.contact ?: metadata.contact,
 		mixins = fabric.mixins ?: mixins?.map { FabricMixinEntry(it) },
+		depends = mergeFabricDependencyBucket(buckets.depends, fabric.depends),
+		recommends = mergeFabricDependencyBucket(buckets.recommends, fabric.recommends),
+		breaks = mergeFabricDependencyBucket(buckets.breaks, fabric.breaks),
+		conflicts = mergeFabricDependencyBucket(buckets.conflicts, fabric.conflicts),
 	)
 }
+
+/**
+ * The unified dependency list, bucketed by [EasyModdingDependencyType] into Fabric's dependency
+ * maps (mod ID -> version range).
+ */
+private data class FabricDependencyBuckets(
+	val depends: Map<String, String>,
+	val recommends: Map<String, String>,
+	val breaks: Map<String, String>,
+	val conflicts: Map<String, String>,
+)
+
+/**
+ * Buckets this unified dependency list into Fabric's dependency maps. See
+ * [EasyModdingDependencyType] for the type -> bucket mapping. A missing [EasyModdingDependency.versionRange]
+ * is written as `*` (any version), since Fabric's maps require a version-range string value.
+ */
+private fun List<EasyModdingDependency>.toFabricDependencyBuckets(): FabricDependencyBuckets {
+	val depends = linkedMapOf<String, String>()
+	val recommends = linkedMapOf<String, String>()
+	val breaks = linkedMapOf<String, String>()
+	val conflicts = linkedMapOf<String, String>()
+	for (dependency in this) {
+		val versionRange = dependency.versionRange ?: "*"
+		when (dependency.type) {
+			EasyModdingDependencyType.Required -> depends[dependency.modId] = versionRange
+			EasyModdingDependencyType.Optional -> recommends[dependency.modId] = versionRange
+			EasyModdingDependencyType.Discouraged -> conflicts[dependency.modId] = versionRange
+			EasyModdingDependencyType.Incompatible -> breaks[dependency.modId] = versionRange
+		}
+	}
+	return FabricDependencyBuckets(depends, recommends, breaks, conflicts)
+}
+
+/**
+ * Merges a bucket generated from the unified dependency list with an explicit override map
+ * declared under `fabric`. Explicit entries win on a mod ID clash. Returns `null` (rather than an
+ * empty map) when there is nothing to write, matching the rest of this file's null-means-absent
+ * convention.
+ */
+private fun mergeFabricDependencyBucket(generated: Map<String, String>, explicit: Map<String, String>?): Map<String, String>? =
+	(generated + (explicit ?: emptyMap())).ifEmpty { null }
 
 /** Serializes this [FabricModJson] to a pretty-printed JSON string for writing to disk. */
 internal fun FabricModJson.toJsonString(): String {

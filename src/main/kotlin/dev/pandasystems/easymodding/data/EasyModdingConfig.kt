@@ -32,6 +32,11 @@ typealias EasyModdingContact = Map<String, String>
  *
  * The shared [metadata] is used as a fallback for loader-specific sections, so common fields only
  * need to be declared once. Loader-specific sections may override or extend those values.
+ *
+ * The shared [dependencies] list works the same way for mod dependency declarations: declare a
+ * dependency once and it is translated into every enabled loader's native dependency schema (see
+ * [EasyModdingDependency] for the exact per-loader mapping). Loader-specific sections may still
+ * declare extra, platform-only dependencies alongside the shared ones.
  */
 @Serializable
 data class EasyModdingConfig(
@@ -41,6 +46,12 @@ data class EasyModdingConfig(
 	val metadata: EasyModdingMetadata,
 	/** Mixin config file names shared across loaders. */
 	val mixins: List<String>? = null,
+	/**
+	 * Unified, loader-agnostic mod dependency declarations. Declared once here, they are mapped
+	 * into `fabric.mod.json`'s `depends`/`recommends`/`conflicts`/`breaks`, NeoForge's and Forge's
+	 * `[[dependencies]]` automatically for every loader that is enabled.
+	 */
+	val dependencies: List<EasyModdingDependency> = emptyList(),
 	/** Fabric-specific overrides/extensions, merged over [metadata]. */
 	val fabric: FabricModJson = FabricModJson(),
 	/** NeoForge-specific overrides/extensions, merged over [metadata]. */

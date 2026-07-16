@@ -188,6 +188,10 @@ object NeoForgeDependencySideSerializer : KSerializer<NeoForgeDependencySide> {
  * Builds the final [NeoForgeModToml] by merging the shared [EasyModdingConfig.metadata] into the
  * NeoForge-specific section. If no explicit `mods` list is provided, a single [NeoForgeMod] is
  * synthesized from the shared metadata.
+ *
+ * The unified [EasyModdingConfig.dependencies] are translated 1:1 into [NeoForgeDependency]
+ * entries (NeoForge's schema matches the unified one almost exactly) and prepended to any
+ * dependencies declared directly under `neoforge`, so platform-only extras can still be appended.
  */
 internal fun EasyModdingConfig.populateNeoForgeModToml(): NeoForgeModToml {
 	return neoforge.copy(
@@ -202,9 +206,21 @@ internal fun EasyModdingConfig.populateNeoForgeModToml(): NeoForgeModToml {
 				authors = metadata.authors?.map { it.name }?.joinToString(", ") { it },
 			)
 		),
-		mixins = neoforge.mixins ?: mixins?.map { NeoForgeMixin(config = it) }
+		mixins = neoforge.mixins ?: mixins?.map { NeoForgeMixin(config = it) },
+		dependencies = (dependencies.map { it.toNeoForgeDependency() } + (neoforge.dependencies ?: emptyList())).ifEmpty { null },
 	)
 }
+
+/** Translates a unified [EasyModdingDependency] into NeoForge's native [NeoForgeDependency] shape. */
+private fun EasyModdingDependency.toNeoForgeDependency() = NeoForgeDependency(
+	modId = modId,
+	type = type.toNeoForgeDependencyType(),
+	reason = reason,
+	versionRange = versionRange,
+	ordering = ordering?.toNeoForgeDependencyOrdering(),
+	side = side?.toNeoForgeDependencySide(),
+	referralUrl = referralUrl,
+)
 
 /** Serializes this [NeoForgeModToml] to a TOML string (via ktoml) for writing to disk. */
 internal fun NeoForgeModToml.toTomlString(): String {

@@ -38,6 +38,23 @@
   "mixins": [
     "example.mixins.json"
   ],
+  "dependencies": [
+    {
+      "modId": "required-mod",
+      "versionRange": ">=1.0.0"
+    },
+    {
+      "modId": "optional-mod",
+      "type": "optional",
+      "versionRange": ">=2.0.0",
+      "reason": "Adds extra integration"
+    },
+    {
+      "modId": "incompatible-mod",
+      "type": "incompatible",
+      "reason": "Known to crash together"
+    }
+  ],
   "fabric": {
     "entrypoints": {
       "client": [

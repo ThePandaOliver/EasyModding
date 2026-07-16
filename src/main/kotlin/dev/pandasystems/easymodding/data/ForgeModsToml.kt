@@ -73,6 +73,12 @@ data class ForgeDependency(
  * Builds the final [ForgeModsToml] by merging the shared [EasyModdingConfig.metadata] into the
  * Forge-specific section. If no explicit `mods` list is provided, a single [ForgeMod] is
  * synthesized from the shared metadata.
+ *
+ * The unified [EasyModdingConfig.dependencies] are translated into [ForgeDependency] entries and
+ * prepended to any dependencies declared directly under `forge`, so platform-only extras can
+ * still be appended. Since legacy Forge only has a boolean [ForgeDependency.mandatory] flag,
+ * [EasyModdingDependencyType.Required] maps to `mandatory = true` and every other type
+ * (`optional`/`incompatible`/`discouraged`) maps to `mandatory = false`.
  */
 internal fun EasyModdingConfig.populateForgeModToml(): ForgeModsToml {
 	return forge.copy(
@@ -86,9 +92,21 @@ internal fun EasyModdingConfig.populateForgeModToml(): ForgeModsToml {
 				logoFile = metadata.icon,
 				authors = metadata.authors?.map { it.name }?.joinToString(", ") { it },
 			)
-		)
+		),
+		dependencies = (dependencies.map { it.toForgeDependency() } + (forge.dependencies ?: emptyList())).ifEmpty { null },
 	)
 }
+
+/** Translates a unified [EasyModdingDependency] into Forge's native [ForgeDependency] shape. */
+private fun EasyModdingDependency.toForgeDependency() = ForgeDependency(
+	modId = modId,
+	mandatory = type == EasyModdingDependencyType.Required,
+	reason = reason,
+	versionRange = versionRange,
+	ordering = ordering?.toNeoForgeDependencyOrdering(),
+	side = side?.toNeoForgeDependencySide(),
+	referralUrl = referralUrl,
+)
 
 /** Serializes this [ForgeModsToml] to a TOML string (via ktoml) for writing to disk. */
 internal fun ForgeModsToml.toTomlString(): String {

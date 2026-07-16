@@ -6,6 +6,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class FabricTest {
 	@Test
@@ -32,5 +33,12 @@ class FabricTest {
 		(project as DefaultProject).evaluate()
 		val task = project.tasks.getByName<GenerateFabricResourcesTask>("generateFabricResources")
 		task.run()
+
+		// The unified `dependencies` declared in easymodding.mod.json should have been bucketed
+		// into Fabric's depends/recommends/breaks maps based on their type.
+		val generated = task.outputDir.get().asFile.readText()
+		assertTrue(generated.contains("\"required-mod\": \">=1.0.0\""), "expected required-mod in depends")
+		assertTrue(generated.contains("\"optional-mod\": \">=2.0.0\""), "expected optional-mod in recommends")
+		assertTrue(generated.contains("\"incompatible-mod\": \"*\""), "expected incompatible-mod in breaks")
 	}
 }

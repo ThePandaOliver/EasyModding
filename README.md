@@ -18,8 +18,12 @@ once and switch platforms with a single Gradle property.
   ForgeGradle) based on the selected platform.
 - **Single source of truth for metadata** — describe your mod once in `easymodding.mod.json`, and
   EasyModding generates the loader-native files at build time.
-- **Unified dependency API** — declare dependencies once with methods like `modImplementation`,
-  `library`, `includeMod`, etc., and they map to the correct loader-specific configurations.
+- **Unified mod dependencies** — declare mod dependencies (`depends`/`recommends`/etc.) once in
+  `easymodding.mod.json`, and they're translated into `fabric.mod.json`, `neoforge.mods.toml`, and
+  `mods.toml`'s native dependency schemas automatically.
+- **Unified dependency API** — declare Gradle dependencies once with methods like
+  `modImplementation`, `library`, `includeMod`, etc., and they map to the correct loader-specific
+  configurations.
 - **Switch platforms with one property** — change `easy_modding.platform` to build for a different
   loader without touching your dependency or metadata declarations.
 
@@ -105,6 +109,11 @@ Create `easymodding.mod.json` in your project directory (the default path; confi
     "contact": { "homepage": "https://example.com" }
   },
   "mixins": ["examplemod.mixins.json"],
+  "dependencies": [
+    { "modId": "fabric", "versionRange": ">=0.92.0" },
+    { "modId": "some-api-mod", "type": "optional", "versionRange": ">=1.0.0" },
+    { "modId": "known-incompatible-mod", "type": "incompatible", "reason": "Crashes on load together" }
+  ],
   "fabric": {
     "entrypoints": {
       "main": ["com.example.mod.CommonMain"],
@@ -116,7 +125,9 @@ Create `easymodding.mod.json` in your project directory (the default path; confi
 ```
 
 The shared `metadata` block is used as the fallback for every loader. Loader-specific sections
-(`fabric`, `neoforge`, `pack`) can override or extend those values.
+(`fabric`, `neoforge`, `pack`) can override or extend those values. The shared `dependencies` list
+works the same way for mod dependencies — see [Unified mod dependencies](#unified-mod-dependencies)
+below.
 
 ### 3. Build
 
@@ -128,6 +139,54 @@ as part of `processResources`. You can also run the generation tasks directly:
 ./gradlew generateNeoForgeResources   # when NeoForge is enabled
 ./gradlew generateForgeResources      # when Forge is enabled
 ```
+
+## Unified mod dependencies
+
+The `dependencies` array in `easymodding.mod.json` (**not** the Gradle `dependencies { }` block
+described below — see [Unified dependency API](#unified-dependency-api) for that) lets you declare
+a mod's dependency relationships once and have them generated into every enabled loader's native
+metadata format:
+
+```json
+{
+  "modId": "fabric-api",
+  "type": "required",
+  "versionRange": ">=0.92.0",
+  "reason": "Needed for networking APIs",
+  "ordering": "after",
+  "side": "both",
+  "referralUrl": "https://modrinth.com/mod/fabric-api"
+}
+```
+
+| Field          | Required | Description                                                             |
+| -------------- | -------- | ------------------------------------------------------------------------ |
+| `modId`        | Yes      | The mod (or loader API, e.g. `fabricloader`, `minecraft`) depended on.  |
+| `type`         | No       | `required` (default), `optional`, `incompatible`, or `discouraged`.     |
+| `versionRange` | No       | Accepted version range, in the target loader's own syntax.             |
+| `reason`       | No       | Shown to the user when the dependency isn't satisfied.                 |
+| `ordering`     | No       | `before`, `after`, or `none` (default; let the loader decide).         |
+| `side`         | No       | `client`, `server`, or `both` (default).                               |
+| `referralUrl`  | No       | A URL with more info about (or to obtain) the dependency.               |
+
+Each entry is translated per-loader when the corresponding metadata is generated:
+
+| `type`         | Fabric (`fabric.mod.json`) | NeoForge / Forge (`[[dependencies]]`)              |
+| -------------- | --------------------------- | --------------------------------------------------- |
+| `required`     | `depends`                   | `type = "required"` / `mandatory = true`             |
+| `optional`     | `recommends`                | `type = "optional"` / `mandatory = false`            |
+| `discouraged`  | `conflicts`                 | `type = "discouraged"` / `mandatory = false`         |
+| `incompatible` | `breaks`                    | `type = "incompatible"` / `mandatory = false`        |
+
+NeoForge's dependency schema matches the unified one almost exactly, so `ordering`, `side`, and
+`referralUrl` carry over untouched. Legacy Forge only has a boolean `mandatory` flag, so anything
+other than `required` maps to `mandatory = false`. Fabric has no version-range-aware equivalent of
+`type` beyond the four buckets above; a missing `versionRange` is written as `*` (any version).
+
+You can still declare extra, platform-only dependencies directly under the `fabric`, `neoforge`,
+or `forge` sections — they're merged alongside (Fabric, keyed by mod ID with the platform-specific
+entry winning on a clash) or appended after (NeoForge/Forge) the ones generated from the shared
+list.
 
 ## Unified dependency API
 
@@ -206,6 +265,7 @@ src/main/kotlin/dev/pandasystems/easymodding/
 ├── EasyModdingPlugin.kt          Main plugin: extension + platform selection + task wiring
 ├── data/                         Metadata models and generation logic
 │   ├── EasyModdingConfig.kt      Unified config model (easymodding.mod.json)
+│   ├── EasyModdingDependency.kt  Unified mod dependency model, shared across all loaders
 │   ├── FabricModJson.kt          fabric.mod.json model + population/serialization
 │   ├── NeoForgeModToml.kt        neoforge.mods.toml model + population/serialization
 │   ├── ForgeModsToml.kt          mods.toml model + population/serialization (Forge's own schema)

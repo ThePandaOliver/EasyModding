@@ -6,6 +6,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class ForgeGradleTest {
 	@Test
@@ -36,5 +37,13 @@ class ForgeGradleTest {
 		(project as DefaultProject).evaluate()
 		val task = project.tasks.getByName<GenerateForgeResourcesTask>("generateForgeResources")
 		task.run()
+
+		// The unified `dependencies` declared in easymodding.mod.json should have been translated
+		// into `mods.toml`'s `[[dependencies]]` entries, with `required-mod` marked mandatory and
+		// the rest not, since legacy Forge only has a boolean mandatory flag.
+		val generated = task.outputDir.get().asFile.resolve("META-INF/mods.toml").readText()
+		assertTrue(generated.contains("required-mod"), "expected required-mod dependency")
+		assertTrue(generated.contains("optional-mod"), "expected optional-mod dependency")
+		assertTrue(generated.contains("incompatible-mod"), "expected incompatible-mod dependency")
 	}
 }

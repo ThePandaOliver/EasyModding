@@ -7,6 +7,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class NeoForgeTest {
 	@Test
@@ -34,5 +35,14 @@ class NeoForgeTest {
 		(project as DefaultProject).evaluate()
 		val task = project.tasks.getByName<GenerateNeoForgeResourcesTask>("generateNeoForgeResources")
 		task.run()
+
+		// The unified `dependencies` declared in easymodding.mod.json should have been translated
+		// 1:1 into `neoforge.mods.toml`'s `[[dependencies]]` entries.
+		val generated = task.outputDir.get().asFile.resolve("META-INF/neoforge.mods.toml").readText()
+		assertTrue(generated.contains("required-mod"), "expected required-mod dependency")
+		assertTrue(generated.contains("optional-mod"), "expected optional-mod dependency")
+		assertTrue(generated.contains("incompatible-mod"), "expected incompatible-mod dependency")
+		assertTrue(generated.contains("\"optional\""), "expected optional dependency type")
+		assertTrue(generated.contains("\"incompatible\""), "expected incompatible dependency type")
 	}
 }
