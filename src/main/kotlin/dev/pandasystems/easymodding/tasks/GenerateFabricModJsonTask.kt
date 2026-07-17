@@ -14,13 +14,15 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Gradle task that generates the Fabric `fabric.mod.json` from the unified `easymodding.mod.json`.
+ * Gradle task that generates `fabric.mod.json` from the unified `easymodding.mod.json`.
  *
- * Registered as `generateFabricResources` by [dev.pandasystems.easymodding.EasyModdingPlugin] and
- * hooked into `processResources`. It is cacheable and only re-runs when the input config changes.
+ * This is the single metadata file Fabric needs, so unlike NeoForge/Forge there is only one such
+ * task. Registered as `generateFabricModJson` by [dev.pandasystems.easymodding.EasyModdingPlugin]
+ * and depended on by the `generateFabricResources` lifecycle task. It is cacheable and only
+ * re-runs when the input config changes.
  */
 @CacheableTask
-abstract class GenerateFabricResourcesTask : DefaultTask() {
+abstract class GenerateFabricModJsonTask : DefaultTask() {
     /** The unified config file (`easymodding.mod.json`) to read from. */
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)

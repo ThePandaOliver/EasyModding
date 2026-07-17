@@ -1,5 +1,5 @@
 import dev.pandasystems.easymodding.extensions.EasyModdingExtension
-import dev.pandasystems.easymodding.tasks.GenerateFabricResourcesTask
+import dev.pandasystems.easymodding.tasks.GenerateFabricModJsonTask
 import org.gradle.api.internal.project.DefaultProject
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.testfixtures.ProjectBuilder
@@ -31,7 +31,10 @@ class FabricTest {
 		}
 
 		(project as DefaultProject).evaluate()
-		val task = project.tasks.getByName<GenerateFabricResourcesTask>("generateFabricResources")
+
+		// `generateFabricResources` is a lifecycle task with no action of its own; the actual
+		// file is written by the `generateFabricModJson` leaf task it depends on.
+		val task = project.tasks.getByName<GenerateFabricModJsonTask>("generateFabricModJson")
 
 		// Gradle pre-creates a task's `@OutputDirectory` paths before executing it for real
 		// (unlike calling `task.run()` directly), so replicate that here to catch bugs where the

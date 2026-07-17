@@ -132,13 +132,40 @@ below.
 ### 3. Build
 
 `fabric.mod.json` / `neoforge.mods.toml` / `mods.toml` / `pack.mcmeta` are generated automatically
-as part of `processResources`. You can also run the generation tasks directly:
+as part of `processResources`. You can also run the per-loader lifecycle tasks directly, each of
+which generates every metadata file that loader needs in one go:
 
 ```bash
-./gradlew generateFabricResources     # when Fabric is enabled
-./gradlew generateNeoForgeResources   # when NeoForge is enabled
-./gradlew generateForgeResources      # when Forge is enabled
+./gradlew generateFabricResources     # when Fabric is enabled   -> fabric.mod.json
+./gradlew generateNeoForgeResources   # when NeoForge is enabled -> neoforge.mods.toml, pack.mcmeta
+./gradlew generateForgeResources      # when Forge is enabled    -> mods.toml, pack.mcmeta
 ```
+
+Under the hood, each of those is a lifecycle task with no action of its own; it just depends on
+the single-purpose leaf task(s) that actually write each metadata file, which you can also run
+individually if you only want to (re)generate one file:
+
+```bash
+./gradlew generateFabricModJson       # writes fabric.mod.json
+./gradlew generateNeoForgeModsToml    # writes META-INF/neoforge.mods.toml
+./gradlew generateForgeModsToml       # writes META-INF/mods.toml
+./gradlew generatePackResources       # writes pack.mcmeta (shared by NeoForge and Forge)
+```
+
+```
+generateFabricResources     -> generateFabricModJson
+generateNeoForgeResources   -> generateNeoForgeModsToml, generatePackResources
+generateForgeResources      -> generateForgeModsToml,    generatePackResources
+```
+
+`pack.mcmeta` is loader-agnostic (its meaning is identical on NeoForge and Forge) and lives at the
+root of the resources directory rather than under `META-INF`, so it's written once by
+`generatePackResources` and depended on by both `generateNeoForgeResources` and
+`generateForgeResources` — but **not** by `generateFabricResources`, since Fabric has no use for
+it. Generating it once, shared, also matters if you enable more than one loader in the same module
+(e.g. a shared/common module preparing metadata for multiple platforms): generating it separately
+per loader would make `processResources` see the same destination path contributed more than once
+and fail with a duplicate-entry error.
 
 ## Unified mod dependencies
 
@@ -284,11 +311,16 @@ src/main/kotlin/dev/pandasystems/easymodding/
 │   ├── loom/EasyModdingLoomRemapPlugin.kt           Fabric (Loom remap, MC <= 1.21.11)
 │   ├── moddev/EasyModdingModdevPlugin.kt            NeoForge (ModDev)
 │   └── forgegradle/EasyModdingForgeGradlePlugin.kt  Forge (ForgeGradle)
-└── tasks/                        Metadata generation tasks
-    ├── GenerateFabricResourcesTask.kt
-    ├── GenerateNeoForgeResourcesTask.kt
-    └── GenerateForgeResourcesTask.kt
+└── tasks/                        Metadata generation tasks (one leaf task per generated file)
+    ├── GenerateFabricModJsonTask.kt      Writes fabric.mod.json
+    ├── GenerateNeoForgeModsTomlTask.kt   Writes META-INF/neoforge.mods.toml
+    ├── GenerateForgeModsTomlTask.kt      Writes META-INF/mods.toml
+    └── GeneratePackMcmetaTask.kt         Writes pack.mcmeta, shared by NeoForge and Forge
 ```
+
+`generateFabricResources`/`generateNeoForgeResources`/`generateForgeResources` are lifecycle tasks
+registered directly in `EasyModdingPlugin.kt` (no dedicated task class) that just `dependsOn` the
+leaf tasks above.
 
 ## Building the plugin
 

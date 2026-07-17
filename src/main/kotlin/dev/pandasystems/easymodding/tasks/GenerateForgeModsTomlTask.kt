@@ -2,8 +2,6 @@ package dev.pandasystems.easymodding.tasks
 
 import dev.pandasystems.easymodding.data.loadEasyModdingConfig
 import dev.pandasystems.easymodding.data.populateForgeModToml
-import dev.pandasystems.easymodding.data.populatePackJson
-import dev.pandasystems.easymodding.data.toJsonString
 import dev.pandasystems.easymodding.data.toTomlString
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -16,20 +14,24 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Gradle task that generates the legacy Forge metadata from the unified `easymodding.mod.json`.
+ * Gradle task that generates legacy Forge's `META-INF/mods.toml` from the unified
+ * `easymodding.mod.json`.
  *
- * Writes `META-INF/mods.toml` and `META-INF/pack.mcmeta`. Registered as `generateForgeResources`
- * by [dev.pandasystems.easymodding.EasyModdingPlugin] and hooked into `processResources`. It is
- * cacheable and only re-runs when the input config changes.
+ * This only writes `mods.toml`; `pack.mcmeta` is generated separately by
+ * [GeneratePackMcmetaTask], since it's shared across every loader and lives at the resources root
+ * rather than under `META-INF`. Registered as `generateForgeModsToml` by
+ * [dev.pandasystems.easymodding.EasyModdingPlugin] and depended on (alongside
+ * [GeneratePackMcmetaTask]) by the `generateForgeResources` lifecycle task. It is cacheable and
+ * only re-runs when the input config changes.
  */
 @CacheableTask
-abstract class GenerateForgeResourcesTask : DefaultTask() {
+abstract class GenerateForgeModsTomlTask : DefaultTask() {
     /** The unified config file (`easymodding.mod.json`) to read from. */
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val configFile: RegularFileProperty
 
-    /** The directory into which the generated `META-INF` metadata files are written. */
+    /** The directory into which the generated `META-INF/mods.toml` is written. */
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
@@ -44,8 +46,5 @@ abstract class GenerateForgeResourcesTask : DefaultTask() {
 
         val metadataFile = metainfDir.resolve("mods.toml")
         metadataFile.writeText(config.populateForgeModToml().toTomlString())
-
-        val packFile = metainfDir.resolve("pack.mcmeta")
-        packFile.writeText(config.populatePackJson().toJsonString())
     }
 }
