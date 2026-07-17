@@ -34,6 +34,10 @@ class NeoForgeTest {
 
 		(project as DefaultProject).evaluate()
 		val task = project.tasks.getByName<GenerateNeoForgeResourcesTask>("generateNeoForgeResources")
+
+		// Gradle pre-creates a task's `@OutputDirectory` paths before executing it for real
+		// (unlike calling `task.run()` directly), so replicate that here.
+		task.outputDir.get().asFile.mkdirs()
 		task.run()
 
 		// The unified `dependencies` declared in easymodding.mod.json should have been translated

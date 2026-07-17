@@ -33,8 +33,10 @@ abstract class GenerateFabricResourcesTask : DefaultTask() {
     @TaskAction
     fun run() {
         val config = loadEasyModdingConfig(configFile.get().asFile)
-        val file = outputDir.get().asFile
-        file.parentFile.mkdirs()
+        val dir = outputDir.get().asFile
+        dir.mkdirs()
+
+        val file = dir.resolve("fabric.mod.json")
         file.writeText(config.populateFabricModJson().toJsonString())
     }
 }

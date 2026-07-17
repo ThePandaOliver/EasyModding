@@ -32,11 +32,16 @@ class FabricTest {
 
 		(project as DefaultProject).evaluate()
 		val task = project.tasks.getByName<GenerateFabricResourcesTask>("generateFabricResources")
+
+		// Gradle pre-creates a task's `@OutputDirectory` paths before executing it for real
+		// (unlike calling `task.run()` directly), so replicate that here to catch bugs where the
+		// task writes onto the directory path itself instead of a file inside it.
+		task.outputDir.get().asFile.mkdirs()
 		task.run()
 
 		// The unified `dependencies` declared in easymodding.mod.json should have been bucketed
 		// into Fabric's depends/recommends/breaks maps based on their type.
-		val generated = task.outputDir.get().asFile.readText()
+		val generated = task.outputDir.get().asFile.resolve("fabric.mod.json").readText()
 		assertTrue(generated.contains("\"required-mod\": \">=1.0.0\""), "expected required-mod in depends")
 		assertTrue(generated.contains("\"optional-mod\": \">=2.0.0\""), "expected optional-mod in recommends")
 		assertTrue(generated.contains("\"incompatible-mod\": \"*\""), "expected incompatible-mod in breaks")
