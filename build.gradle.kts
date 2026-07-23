@@ -70,7 +70,7 @@ publishing {
 	repositories {
 		maven {
 			name = "LocalRepo"
-			url = uri("D:\\Maven Repo")
+			url = uri("E:\\MavenRepo")
 		}
 	}
 }
