@@ -124,7 +124,7 @@ Create `easymodding.mod.json` in your project directory (the default path; confi
 ```
 
 The shared `metadata` block is used as the fallback for every loader. Loader-specific sections
-(`fabric`, `neoforge`, `pack`) can override or extend those values. The shared `dependencies` list
+(`fabric`, `neoforge`, `pack`) can override or extend those values. The shared `modDependencies` list
 works the same way for mod dependencies — see [Unified mod dependencies](#unified-mod-dependencies)
 below.
 
@@ -168,7 +168,7 @@ and fail with a duplicate-entry error.
 
 ## Unified mod dependencies
 
-The `dependencies` array in `easymodding.mod.json` (**not** the Gradle `dependencies { }` block
+The `modDependencies` array in `easymodding.mod.json` (**not** the Gradle `dependencies { }` block
 described below — see [Unified dependency API](#unified-dependency-api) for that) lets you declare
 a mod's dependency relationships once and have them generated into every enabled loader's native
 metadata format:

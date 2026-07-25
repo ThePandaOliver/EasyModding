@@ -17,6 +17,11 @@ class EasyModdingLoomNoremapPlugin : BaseEasyModdingPlatformPlugin() {
 		target.pluginManager.apply("net.fabricmc.fabric-loom")
 		val extension = target.easyModding
 
-		target.dependencies.add("minecraft", "com.mojang:minecraft:${extension.minecraftVersion.get()}")
+		target.dependencies.add(
+			"minecraft",
+			extension.minecraftVersion.map { version ->
+				"com.mojang:minecraft:$version"
+			},
+		)
 	}
 }

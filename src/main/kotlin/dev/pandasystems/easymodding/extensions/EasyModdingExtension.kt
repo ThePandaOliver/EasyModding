@@ -5,7 +5,6 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
 /**
@@ -83,7 +82,7 @@ abstract class EasyModdingExtension @Inject constructor(
 	fun forge() = forge.enabled.set(true)
 
 	/** Declares cross-platform dependencies via the [EasyModdingDependencies] API. */
-	fun dependencies(action: Action<EasyModdingDependencies>) {
+	fun modDependencies(action: Action<EasyModdingDependencies>) {
 		action.execute(dependencies)
 	}
 }

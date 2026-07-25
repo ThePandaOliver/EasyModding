@@ -19,7 +19,12 @@ class EasyModdingLoomRemapPlugin : BaseEasyModdingPlatformPlugin() {
 		val extension = target.easyModding
 		val loom = target.extensions.getByType(LoomGradleExtensionAPI::class.java)
 
-		target.dependencies.add("minecraft", "com.mojang:minecraft:${extension.minecraftVersion.get()}")
+		target.dependencies.add(
+			"minecraft",
+			extension.minecraftVersion.map { version ->
+				"com.mojang:minecraft:$version"
+			},
+		)
 		target.dependencies.add("mappings", loom.officialMojangMappings())
 	}
 }

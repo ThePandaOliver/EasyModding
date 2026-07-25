@@ -21,7 +21,7 @@ abstract class EasyModdingDependencies @Inject constructor(
 ) {
 	/** The loaders whose Gradle configuration names this API knows how to map to. */
 	private enum class Platform {
-		FABRIC, NEOFORGE, FORGE, UNKNOWN
+		FABRIC, FABRIC_REMAP, NEOFORGE, FORGE, UNKNOWN
 	}
 
 	/**
@@ -32,6 +32,7 @@ abstract class EasyModdingDependencies @Inject constructor(
 	private val platform: Platform by lazy {
 		when {
 			project.pluginManager.hasPlugin("net.fabricmc.fabric-loom") -> Platform.FABRIC
+			project.pluginManager.hasPlugin("net.fabricmc.fabric-loom-remap") -> Platform.FABRIC_REMAP
 			project.pluginManager.hasPlugin("net.neoforged.moddev") -> Platform.NEOFORGE
 			project.pluginManager.hasPlugin("net.minecraftforge.gradle") -> Platform.FORGE
 			else -> Platform.UNKNOWN
@@ -46,8 +47,8 @@ abstract class EasyModdingDependencies @Inject constructor(
 	 */
 	fun modImplementation(notation: Any) {
 		when (platform) {
-			Platform.FABRIC -> project.dependencies.add("modImplementation", notation)
-			Platform.NEOFORGE, Platform.FORGE -> project.dependencies.add("implementation", notation)
+			Platform.FABRIC_REMAP -> project.dependencies.add("modImplementation", notation)
+			Platform.FABRIC, Platform.NEOFORGE, Platform.FORGE -> project.dependencies.add("implementation", notation)
 			Platform.UNKNOWN -> throw IllegalStateException(
 				"Cannot add mod dependency: No supported mod loader plugin detected. " +
 				"Please ensure either fabric-loom, neoforged-moddev, or forgegradle is applied."
@@ -64,8 +65,8 @@ abstract class EasyModdingDependencies @Inject constructor(
 	 */
 	fun modApi(notation: Any) {
 		when (platform) {
-			Platform.FABRIC -> project.dependencies.add("modApi", notation)
-			Platform.NEOFORGE, Platform.FORGE -> {
+			Platform.FABRIC_REMAP -> project.dependencies.add("modApi", notation)
+			Platform.FABRIC, Platform.NEOFORGE, Platform.FORGE -> {
 				// Ensure java-library plugin is applied for api configuration
 				if (!project.pluginManager.hasPlugin("java-library")) {
 					project.pluginManager.apply("java-library")
@@ -86,8 +87,8 @@ abstract class EasyModdingDependencies @Inject constructor(
 	 */
 	fun modCompileOnly(notation: Any) {
 		when (platform) {
-			Platform.FABRIC -> project.dependencies.add("modCompileOnly", notation)
-			Platform.NEOFORGE, Platform.FORGE -> project.dependencies.add("compileOnly", notation)
+			Platform.FABRIC_REMAP -> project.dependencies.add("modCompileOnly", notation)
+			Platform.FABRIC, Platform.NEOFORGE, Platform.FORGE -> project.dependencies.add("compileOnly", notation)
 			Platform.UNKNOWN -> throw IllegalStateException(
 				"Cannot add mod compile-only dependency: No supported mod loader plugin detected."
 			)
@@ -102,8 +103,8 @@ abstract class EasyModdingDependencies @Inject constructor(
 	 */
 	fun modLocalRuntime(notation: Any) {
 		when (platform) {
-			Platform.FABRIC -> project.dependencies.add("modLocalRuntime", notation)
-			Platform.NEOFORGE, Platform.FORGE -> project.dependencies.add("runtimeOnly", notation)
+			Platform.FABRIC_REMAP -> project.dependencies.add("modLocalRuntime", notation)
+			Platform.FABRIC, Platform.NEOFORGE, Platform.FORGE -> project.dependencies.add("runtimeOnly", notation)
 			Platform.UNKNOWN -> throw IllegalStateException(
 				"Cannot add mod local runtime dependency: No supported mod loader plugin detected."
 			)
@@ -134,7 +135,7 @@ abstract class EasyModdingDependencies @Inject constructor(
 		
 		// Then add to jar-in-jar configuration
 		when (platform) {
-			Platform.FABRIC -> {
+			Platform.FABRIC, Platform.FABRIC_REMAP -> {
 				project.dependencies.add("include", notation)
 			}
 			Platform.NEOFORGE, Platform.FORGE -> {
@@ -167,7 +168,7 @@ abstract class EasyModdingDependencies @Inject constructor(
 		
 		// Then add to jar-in-jar configuration
 		when (platform) {
-			Platform.FABRIC -> {
+			Platform.FABRIC, Platform.FABRIC_REMAP -> {
 				project.dependencies.add("include", notation)
 			}
 			Platform.NEOFORGE, Platform.FORGE -> {
