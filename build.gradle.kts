@@ -43,10 +43,6 @@ gradlePlugin {
 			id = "dev.pandasystems.easymodding"
 			implementationClass = "dev.pandasystems.easymodding.EasyModdingPlugin"
 		}
-		register("easy-modding-loom") {
-			id = "dev.pandasystems.easymodding.loom"
-			implementationClass = "dev.pandasystems.easymodding.platform.loom.EasyModdingLoomPlugin"
-		}
 		register("easy-modding-loom-noremap") {
 			id = "dev.pandasystems.easymodding.loom-noremap"
 			implementationClass = "dev.pandasystems.easymodding.platform.loom.EasyModdingLoomNoremapPlugin"
