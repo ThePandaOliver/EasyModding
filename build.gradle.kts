@@ -66,7 +66,7 @@ publishing {
 	repositories {
 		maven {
 			name = "LocalRepo"
-			url = uri("E:\\MavenRepo")
+			url = uri(providers.gradleProperty("LocalRepo"))
 		}
 	}
 }
