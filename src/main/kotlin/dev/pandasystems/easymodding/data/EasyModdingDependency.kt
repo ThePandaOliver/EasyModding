@@ -13,8 +13,8 @@ import kotlinx.serialization.Serializable
  * loader-native shape:
  *  - Fabric: bucketed into `depends`/`recommends`/`conflicts`/`breaks` based on [type] (see
  *    [EasyModdingDependencyType] for the exact mapping).
- *  - NeoForge: appended to `[[dependencies]]` as-is, since NeoForge's dependency schema matches
- *    this one almost exactly.
+ *  - NeoForge: appended to `[[dependencies]]`, converting the shared semver-style version range
+ *    to NeoForge's Maven version-range syntax.
  *  - Forge: appended to `[[dependencies]]`, with [type] collapsed to the boolean `mandatory` flag
  *    Forge's legacy schema uses ([EasyModdingDependencyType.Required] only).
  *
@@ -30,8 +30,8 @@ data class EasyModdingDependency(
 	/** How strictly this dependency is required. Defaults to [EasyModdingDependencyType.Required]. */
 	val type: EasyModdingDependencyType = EasyModdingDependencyType.Required,
 	/**
-	 * The accepted version range, in the target loader's own range syntax (Fabric uses semver
-	 * ranges, NeoForge/Forge use Maven version ranges). Left unset, any version is accepted.
+	 * The accepted version range in shared semver-style syntax (for example, `>=1.0.0`). It is
+	 * converted to Maven range syntax for NeoForge. Left unset, any version is accepted.
 	 */
 	val versionRange: String? = null,
 	/** Human-readable explanation shown to the user when this dependency isn't satisfied. */
@@ -85,6 +85,24 @@ internal fun EasyModdingDependencyType.toNeoForgeDependencyType(): NeoForgeDepen
 	EasyModdingDependencyType.Optional -> NeoForgeDependencyType.Optional
 	EasyModdingDependencyType.Incompatible -> NeoForgeDependencyType.Incompatible
 	EasyModdingDependencyType.Discouraged -> NeoForgeDependencyType.Discouraged
+}
+
+/**
+ * Converts a single semver-style bound to the Maven range syntax used by NeoForge.
+ *
+ * Already-native ranges and expressions that are not a single bound are preserved so that
+ * loader-specific syntax is not silently changed or made less precise.
+ */
+internal fun String.toNeoForgeVersionRange(): String {
+	val match = Regex("^(>=|>|<=|<)\\s*(.+)$").matchEntire(trim()) ?: return this
+	val (operator, version) = match.destructured
+	return when (operator) {
+		">=" -> "[$version,)"
+		">" -> "($version,)"
+		"<=" -> "(,$version]"
+		"<" -> "(,$version)"
+		else -> this
+	}
 }
 
 /** Maps the unified [EasyModdingDependencyOrdering] to the shared NeoForge/Forge ordering enum. */

@@ -185,24 +185,24 @@ metadata format:
 }
 ```
 
-| Field          | Required | Description                                                             |
-| -------------- | -------- | ------------------------------------------------------------------------ |
-| `modId`        | Yes      | The mod (or loader API, e.g. `fabricloader`, `minecraft`) depended on.  |
-| `type`         | No       | `required` (default), `optional`, `incompatible`, or `discouraged`.     |
-| `versionRange` | No       | Accepted version range, in the target loader's own syntax.             |
-| `reason`       | No       | Shown to the user when the dependency isn't satisfied.                 |
-| `ordering`     | No       | `before`, `after`, or `none` (default; let the loader decide).         |
-| `side`         | No       | `client`, `server`, or `both` (default).                               |
-| `referralUrl`  | No       | A URL with more info about (or to obtain) the dependency.               |
+| Field          | Required | Description                                                                           |
+|----------------|----------|---------------------------------------------------------------------------------------|
+| `modId`        | Yes      | The mod (or loader API, e.g. `fabricloader`, `minecraft`) depended on.                |
+| `type`         | No       | `required` (default), `optional`, `incompatible`, or `discouraged`.                   |
+| `versionRange` | No       | Accepted semver-style version range; NeoForge converts single bounds to Maven syntax. |
+| `reason`       | No       | Shown to the user when the dependency isn't satisfied.                                |
+| `ordering`     | No       | `before`, `after`, or `none` (default; let the loader decide).                        |
+| `side`         | No       | `client`, `server`, or `both` (default).                                              |
+| `referralUrl`  | No       | A URL with more info about (or to obtain) the dependency.                             |
 
 Each entry is translated per-loader when the corresponding metadata is generated:
 
-| `type`         | Fabric (`fabric.mod.json`) | NeoForge / Forge (`[[dependencies]]`)              |
-| -------------- | --------------------------- | --------------------------------------------------- |
-| `required`     | `depends`                   | `type = "required"` / `mandatory = true`             |
-| `optional`     | `recommends`                | `type = "optional"` / `mandatory = false`            |
-| `discouraged`  | `conflicts`                 | `type = "discouraged"` / `mandatory = false`         |
-| `incompatible` | `breaks`                    | `type = "incompatible"` / `mandatory = false`        |
+| `type`         | Fabric (`fabric.mod.json`) | NeoForge / Forge (`[[dependencies]]`)         |
+|----------------|----------------------------|-----------------------------------------------|
+| `required`     | `depends`                  | `type = "required"` / `mandatory = true`      |
+| `optional`     | `recommends`               | `type = "optional"` / `mandatory = false`     |
+| `discouraged`  | `conflicts`                | `type = "discouraged"` / `mandatory = false`  |
+| `incompatible` | `breaks`                   | `type = "incompatible"` / `mandatory = false` |
 
 NeoForge's dependency schema matches the unified one almost exactly, so `ordering`, `side`, and
 `referralUrl` carry over untouched. Legacy Forge only has a boolean `mandatory` flag, so anything
@@ -219,17 +219,17 @@ list.
 Inside `easyModding { dependencies { } }`, use the loader-agnostic methods below. EasyModding maps
 each to the correct configuration for the active platform.
 
-| Method               | Description                                        | Fabric           | NeoForge / Forge                    |
-| -------------------- | -------------------------------------------------- | ---------------- | ----------------------------------- |
-| `modImplementation`  | Mod dep, compile + runtime                         | `modImplementation` | `implementation`                 |
-| `modApi`             | Mod dep, exposed as API to dependents              | `modApi`         | `api` (auto-applies `java-library`) |
-| `modCompileOnly`     | Mod dep, compile only                              | `modCompileOnly` | `compileOnly`                       |
-| `modLocalRuntime`    | Mod dep, dev runtime only                          | `modLocalRuntime`| `runtimeOnly`                       |
-| `library`            | Plain library, compile + runtime                   | `implementation` | `implementation`                    |
-| `libraryCompileOnly` | Plain library, compile only                        | `compileOnly`    | `compileOnly`                       |
-| `libraryRuntimeOnly` | Plain library, runtime only                        | `runtimeOnly`    | `runtimeOnly`                       |
-| `includeLibrary`     | Bundle a library inside the jar (jar-in-jar)       | `include`        | `jarJar`                            |
-| `includeMod`         | Bundle a mod inside the jar (jar-in-jar)           | `include`        | `jarJar`                            |
+| Method               | Description                                  | Fabric              | NeoForge / Forge                    |
+|----------------------|----------------------------------------------|---------------------|-------------------------------------|
+| `modImplementation`  | Mod dep, compile + runtime                   | `modImplementation` | `implementation`                    |
+| `modApi`             | Mod dep, exposed as API to dependents        | `modApi`            | `api` (auto-applies `java-library`) |
+| `modCompileOnly`     | Mod dep, compile only                        | `modCompileOnly`    | `compileOnly`                       |
+| `modLocalRuntime`    | Mod dep, dev runtime only                    | `modLocalRuntime`   | `runtimeOnly`                       |
+| `library`            | Plain library, compile + runtime             | `implementation`    | `implementation`                    |
+| `libraryCompileOnly` | Plain library, compile only                  | `compileOnly`       | `compileOnly`                       |
+| `libraryRuntimeOnly` | Plain library, runtime only                  | `runtimeOnly`       | `runtimeOnly`                       |
+| `includeLibrary`     | Bundle a library inside the jar (jar-in-jar) | `include`           | `jarJar`                            |
+| `includeMod`         | Bundle a mod inside the jar (jar-in-jar)     | `include`           | `jarJar`                            |
 
 ### Examples
 

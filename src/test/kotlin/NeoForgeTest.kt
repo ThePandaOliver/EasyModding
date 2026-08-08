@@ -52,6 +52,7 @@ class NeoForgeTest {
 		assertTrue(generated.contains("incompatible-mod"), "expected incompatible-mod dependency")
 		assertTrue(generated.contains("\"optional\""), "expected optional dependency type")
 		assertTrue(generated.contains("\"incompatible\""), "expected incompatible dependency type")
+		assertTrue(generated.contains("versionRange = \"[1.0.0,)\""), "expected Maven version range")
 
 		// pack.mcmeta is generated separately by GeneratePackMcmetaTask (see PackMcmetaTest), not
 		// duplicated here, so that enabling multiple loaders doesn't produce clashing
