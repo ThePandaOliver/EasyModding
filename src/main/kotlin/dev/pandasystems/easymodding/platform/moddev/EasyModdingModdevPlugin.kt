@@ -15,13 +15,15 @@ import org.gradle.api.Project
  * from EasyModding's own [dev.pandasystems.easymodding.extensions.NeoForgeExtension].
  */
 class EasyModdingModdevPlugin : BaseEasyModdingPlatformPlugin() {
-	override fun apply(target: Project) {
-		target.pluginManager.apply("net.neoforged.moddev")
-		val extension = target.easyModding
-		val neoForgeExtension = target.extensions.getByType(NeoForgeExtension::class.java)
+    override fun apply(target: Project) {
+        target.pluginManager.apply("net.neoforged.moddev")
+        val extension = target.easyModding
+        val neoForgeExtension = target.extensions.getByType(NeoForgeExtension::class.java)
 
-		// Only override the ModDev version when the user actually specified one via
-		// `easyModding { neoForge { neoForgeVersion.set(...) } }`.
-		extension.neoForge.neoForgeVersion.orNull?.let { neoForgeExtension.version = it }
-	}
+        // Only override the ModDev version when the user actually specified one via
+        // `easyModding { neoForge { neoForgeVersion.set(...) } }`.
+        target.afterEvaluate {
+            extension.neoForge.neoForgeVersion.orNull?.let { neoForgeExtension.version = it }
+        }
+    }
 }
