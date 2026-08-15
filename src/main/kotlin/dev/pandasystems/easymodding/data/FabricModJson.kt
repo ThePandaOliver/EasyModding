@@ -17,13 +17,6 @@ import kotlinx.serialization.json.put
 
 // Reference: https://docs.fabricmc.net/develop/loader/fabric-mod-json
 
-/**
- * Data model of Fabric's `fabric.mod.json` mod metadata file.
- *
- * Doubles as the `fabric` section of `easymodding.mod.json` (allowing Fabric-specific overrides)
- * and as the output model that is serialized to the final `fabric.mod.json`. See the Fabric docs
- * linked above for the meaning of each field.
- */
 @Serializable
 data class FabricModJson(
 	val schemaVersion: Int = 1,
@@ -53,22 +46,16 @@ data class FabricModJson(
 	val conflicts: Map<String, String>? = null,
 )
 
-/** A nested (jar-in-jar) jar entry within `fabric.mod.json`. */
 @Serializable
 data class FabricJarEntry(val file: String)
 
 
-/**
- * A Fabric author/contributor. Serialized via [FabricPersonSerializer] as either a bare string or
- * a `{ name, contact }` object depending on whether [contact] is present.
- */
 @Serializable(with = FabricPersonSerializer::class)
 data class FabricPerson(
 	val name: String,
 	val contact: Map<String, String>? = null,
 )
 
-/** Custom serializer emitting a Fabric person as a bare string or a `{ name, contact }` object. */
 object FabricPersonSerializer : KSerializer<FabricPerson> {
 	override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
 
@@ -96,17 +83,12 @@ object FabricPersonSerializer : KSerializer<FabricPerson> {
 	}
 }
 
-/**
- * A Fabric mixin config entry. Serialized via [FabricMixinEntrySerializer] as a bare string when
- * there is no [environment], or a `{ config, environment }` object otherwise.
- */
 @Serializable(with = FabricMixinEntrySerializer::class)
 data class FabricMixinEntry(
 	val config: String,
 	val environment: String? = null,
 )
 
-/** Custom serializer emitting a mixin entry as a bare string or `{ config, environment }` object. */
 object FabricMixinEntrySerializer : KSerializer<FabricMixinEntry> {
 	override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
 
@@ -134,15 +116,6 @@ object FabricMixinEntrySerializer : KSerializer<FabricMixinEntry> {
 	}
 }
 
-/**
- * Builds the final [FabricModJson] by merging the shared [EasyModdingConfig.metadata] into the
- * Fabric-specific section. Fabric-specific values take precedence; where absent, the shared
- * metadata is used as a fallback.
- *
- * The unified [EasyModdingConfig.dependencies] are bucketed into `depends`/`recommends`/
- * `conflicts`/`breaks` (see [EasyModdingDependencyType]) and merged with any dependencies declared
- * directly under `fabric`; on a mod ID clash the explicit `fabric` entry wins.
- */
 internal fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
 	val buckets = dependencies.toFabricDependencyBuckets()
 	return fabric.copy(
@@ -163,10 +136,6 @@ internal fun EasyModdingConfig.populateFabricModJson(): FabricModJson {
 	)
 }
 
-/**
- * The unified dependency list, bucketed by [EasyModdingDependencyType] into Fabric's dependency
- * maps (mod ID -> version range).
- */
 private data class FabricDependencyBuckets(
 	val depends: Map<String, String>,
 	val recommends: Map<String, String>,
@@ -174,11 +143,6 @@ private data class FabricDependencyBuckets(
 	val conflicts: Map<String, String>,
 )
 
-/**
- * Buckets this unified dependency list into Fabric's dependency maps. See
- * [EasyModdingDependencyType] for the type -> bucket mapping. A missing [EasyModdingDependency.versionRange]
- * is written as `*` (any version), since Fabric's maps require a version-range string value.
- */
 private fun List<EasyModdingDependency>.toFabricDependencyBuckets(): FabricDependencyBuckets {
 	val depends = linkedMapOf<String, String>()
 	val recommends = linkedMapOf<String, String>()
@@ -196,16 +160,9 @@ private fun List<EasyModdingDependency>.toFabricDependencyBuckets(): FabricDepen
 	return FabricDependencyBuckets(depends, recommends, breaks, conflicts)
 }
 
-/**
- * Merges a bucket generated from the unified dependency list with an explicit override map
- * declared under `fabric`. Explicit entries win on a mod ID clash. Returns `null` (rather than an
- * empty map) when there is nothing to write, matching the rest of this file's null-means-absent
- * convention.
- */
 private fun mergeFabricDependencyBucket(generated: Map<String, String>, explicit: Map<String, String>?): Map<String, String>? =
 	(generated + (explicit ?: emptyMap())).ifEmpty { null }
 
-/** Serializes this [FabricModJson] to a pretty-printed JSON string for writing to disk. */
 internal fun FabricModJson.toJsonString(): String {
 	val jsonFormat = Json {
 		ignoreUnknownKeys = true

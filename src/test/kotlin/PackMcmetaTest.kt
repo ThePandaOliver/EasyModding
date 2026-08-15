@@ -12,17 +12,6 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-/**
- * Regression test for a shared/common module enabling more than one loader at once (e.g. a
- * "core" module that pre-generates metadata for both NeoForge and Forge). Previously each
- * loader's resource task wrote its own `META-INF/pack.mcmeta`, which made `processResources` see
- * the same destination path contributed twice and fail with a duplicate-entry error. `pack.mcmeta`
- * should now be generated exactly once by [GeneratePackMcmetaTask], at the root of its output
- * directory, regardless of how many loaders are enabled.
- *
- * Also verifies the lifecycle task graph: `generateNeoForgeResources`/`generateForgeResources`
- * depend on the shared `generatePackResources` task, but `generateFabricResources` does not.
- */
 class PackMcmetaTest {
 	@Test
 	fun testTask(@TempDir projectDir: File) {

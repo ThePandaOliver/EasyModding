@@ -4,19 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-/**
- * Data model of Minecraft's `pack.mcmeta` resource/data pack descriptor.
- *
- * Minecraft has two shapes for declaring the supported pack format: the legacy single
- * `pack_format` and the modern `min_format`/`max_format` range. The [legacy] and [modern]
- * accessors normalize whatever was configured into a single consistent representation, filling in
- * missing sides of the range where necessary.
- */
 @Serializable
 data class PackMcmeta(
 	val pack: PackData
 ) {
-	/** This descriptor coerced to the legacy single `pack_format` form. */
+
 	internal val legacy: PackMcmeta
 		get() = PackMcmeta(let {
 			if (pack.packFormat != null) PackData(packFormat = pack.packFormat)
@@ -25,7 +17,7 @@ data class PackMcmeta(
 			else throw IllegalArgumentException("Pack format not specified")
 		})
 
-	/** This descriptor coerced to the modern `min_format`/`max_format` range form. */
+
 	internal val modern: PackMcmeta
 		get() = PackMcmeta(let {
 			if (pack.minFormat != null || pack.maxFormat != null)
@@ -35,7 +27,6 @@ data class PackMcmeta(
 		})
 }
 
-/** The `pack` object inside `pack.mcmeta`, holding the description and format(s). */
 @Serializable
 data class PackData(
 	val description: String? = null,
@@ -48,7 +39,6 @@ data class PackData(
 
 )
 
-/** Builds a [PackMcmeta] from the [EasyModdingConfig.pack] section. */
 internal fun EasyModdingConfig.populatePackJson(): PackMcmeta {
 	return PackMcmeta(
 		pack = PackData(
@@ -60,7 +50,6 @@ internal fun EasyModdingConfig.populatePackJson(): PackMcmeta {
 	)
 }
 
-/** Serializes this [PackMcmeta] to a pretty-printed JSON string for writing to disk. */
 internal fun PackMcmeta.toJsonString(): String {
 	val jsonFormat = Json {
 		encodeDefaults = true

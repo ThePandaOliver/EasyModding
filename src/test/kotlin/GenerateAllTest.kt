@@ -7,18 +7,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-/**
- * End-to-end functional test (via Gradle TestKit, running a real build through the real task
- * execution graph) for the "generate everything at once" scenario: a project — e.g. a
- * shared/common module — that enables Fabric, NeoForge, and Forge all at the same time and asks
- * Gradle to generate every loader's metadata in a single build.
- *
- * Unlike the other tests in this suite, which call a task's action directly via `task.run()` and
- * never go through Gradle's real `Copy`/duplicate-handling machinery, this test drives an actual
- * build via [GradleRunner]. It is a regression test for a real bug where enabling more than one
- * loader made `processResources` see `pack.mcmeta` contributed by more than one task at the same
- * destination path, failing the build with `Entry META-INF/pack.mcmeta is a duplicate...`.
- */
 class GenerateAllTest {
 	@Test
 	fun generatingEveryLoaderAtOnceDoesNotConflict(@TempDir projectDir: File) {

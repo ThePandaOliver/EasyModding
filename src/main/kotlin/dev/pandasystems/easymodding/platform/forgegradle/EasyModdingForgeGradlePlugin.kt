@@ -5,15 +5,6 @@ import net.minecraftforge.gradle.ForgeGradleExtension
 import net.minecraftforge.gradle.MinecraftExtensionForProject
 import org.gradle.api.Project
 
-/**
- * Platform plugin for legacy Forge, backed by ForgeGradle (`net.minecraftforge.gradle`).
- *
- * Registered as `dev.pandasystems.easymodding.forgegradle` and applied automatically by the main
- * plugin when `easy_modding.platform=forgegradle`. It applies ForgeGradle 7, registers the
- * repositories ForgeGradle needs to resolve the generated Minecraft/Forge artifacts, and, once the
- * project is fully configured, declares the Minecraft/Forge dependency using the Minecraft version
- * from the shared `easyModding` extension and the Forge version from `easyModding { forge { } }`.
- */
 class EasyModdingForgeGradlePlugin : BaseEasyModdingPlatformPlugin() {
 	override fun apply(target: Project) {
 		target.pluginManager.apply("net.minecraftforge.gradle")
