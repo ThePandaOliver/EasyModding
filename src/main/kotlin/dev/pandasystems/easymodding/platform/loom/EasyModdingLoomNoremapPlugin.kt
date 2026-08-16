@@ -12,14 +12,14 @@ class EasyModdingLoomNoremapPlugin : BaseEasyModdingPlatformPlugin() {
 		val extension = target.easyModding
 		val loom = target.extensions.getByType(LoomGradleExtensionAPI::class.java)
 
-		target.afterEvaluate {
-			target.dependencies.add(
-				"minecraft",
-				extension.minecraftVersion.map { version ->
-					"com.mojang:minecraft:$version"
-				},
-			)
+		target.dependencies.add(
+			"minecraft",
+			extension.minecraftVersion.map { version ->
+				"com.mojang:minecraft:$version"
+			},
+		)
 
+		target.afterEvaluate {
 			extension.runs.forEach {
 				loom.runConfigs.create(it.name) {
 					displayName.convention(it.name)
