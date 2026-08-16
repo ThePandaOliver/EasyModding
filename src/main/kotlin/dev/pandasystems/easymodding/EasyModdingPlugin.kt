@@ -12,20 +12,18 @@ import org.gradle.language.jvm.tasks.ProcessResources
 class EasyModdingPlugin : Plugin<Project> {
 	override fun apply(target: Project) {
 		val easyModdingExtension = target.extensions.create("easyModding", EasyModdingExtension::class.java)
-		val platform = target.findProperty("easy_modding.platform") as? String
 
 		target.pluginManager.apply("java")
+		target.pluginManager.apply("java-library")
 		target.pluginManager.apply("idea")
 
-		when (platform) {
-			"loom-noremap" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-noremap")
-			"loom-remap" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-remap")
-			"moddev" -> target.pluginManager.apply("dev.pandasystems.easymodding.moddev")
-			"forgegradle" -> target.pluginManager.apply("dev.pandasystems.easymodding.forgegradle")
-			null -> {} // No platform selected: skip loader wiring (e.g. a common/shared module).
-			else -> throw IllegalArgumentException(
-				"Unknown platform: $platform (Available: loom-noremap, loom-remap, moddev, forgegradle)"
-			)
+		easyModdingExtension.platform.orNull?.let { platform ->
+			when (platform) {
+				PluginPlatform.FABRIC_LOOM -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-noremap")
+				PluginPlatform.FABRIC_LOOM_REMAP -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-remap")
+				PluginPlatform.MODDEV -> target.pluginManager.apply("dev.pandasystems.easymodding.moddev")
+				PluginPlatform.FORGE_GRADLE -> target.pluginManager.apply("dev.pandasystems.easymodding.forgegradle")
+			}
 		}
 
 		val generateFabricModJson =
@@ -55,7 +53,7 @@ class EasyModdingPlugin : Plugin<Project> {
 				outputDir.convention(target.layout.buildDirectory.dir("generated/easy-modding/pack/resources"))
 				onlyIf {
 					easyModdingExtension.neoForge.enabled.getOrElse(false) ||
-						easyModdingExtension.forge.enabled.getOrElse(false)
+							easyModdingExtension.forge.enabled.getOrElse(false)
 				}
 			}
 
@@ -76,11 +74,17 @@ class EasyModdingPlugin : Plugin<Project> {
 		}
 
 		target.tasks.named("processResources", ProcessResources::class.java) {
-			dependsOn(generateFabricResources, generateNeoForgeResources, generateForgeResources)
-			from(generateFabricModJson)
-			from(generateNeoForgeModsToml)
-			from(generateForgeModsToml)
-			from(generatePackResources)
+			dependsOn(
+				generateFabricResources,
+				generateNeoForgeResources,
+				generateForgeResources
+			)
+			from(
+				generateFabricModJson,
+				generateNeoForgeModsToml,
+				generateForgeModsToml,
+				generatePackResources
+			)
 		}
 	}
 }

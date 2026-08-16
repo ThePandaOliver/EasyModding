@@ -39,10 +39,6 @@ abstract class EasyModdingDependencies @Inject constructor(
 		when (platform) {
 			Platform.FABRIC_REMAP -> project.dependencies.add("modApi", notation)
 			Platform.FABRIC, Platform.NEOFORGE, Platform.FORGE -> {
-				// Ensure java-library plugin is applied for api configuration
-				if (!project.pluginManager.hasPlugin("java-library")) {
-					project.pluginManager.apply("java-library")
-				}
 				project.dependencies.add("api", notation)
 			}
 			Platform.UNKNOWN -> throw IllegalStateException(
