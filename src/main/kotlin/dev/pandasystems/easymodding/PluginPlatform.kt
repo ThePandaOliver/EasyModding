@@ -4,7 +4,8 @@ enum class PluginPlatform {
 	FABRIC_LOOM,
 	FABRIC_LOOM_REMAP,
 	MODDEV,
-	FORGE_GRADLE;
+	FORGE_GRADLE,
+	NONE;
 
 	val isLoom: Boolean
 		get() = this == FABRIC_LOOM

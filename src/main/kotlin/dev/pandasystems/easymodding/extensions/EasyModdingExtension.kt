@@ -3,6 +3,7 @@ package dev.pandasystems.easymodding.extensions
 import dev.pandasystems.easymodding.PluginPlatform
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
@@ -12,24 +13,24 @@ import javax.inject.Inject
 abstract class EasyModdingExtension @Inject constructor(
 	objects: ObjectFactory,
 	layout: ProjectLayout,
-	providers: ProviderFactory
+	project: Project
 ) {
+	val modId = objects.property<String>()
 	val minecraftVersion = objects.property<String>()
 	val configPath = objects.fileProperty().convention(layout.projectDirectory.file("easymodding.mod.json"))
 
-	val platform = objects.property<PluginPlatform>().convention(
-		providers.gradleProperty("easy_modding.platform").map { value ->
-			when (value) {
-				"loom-noremap", "loom" -> PluginPlatform.FABRIC_LOOM
-				"loom-remap" -> PluginPlatform.FABRIC_LOOM_REMAP
-				"moddev" -> PluginPlatform.MODDEV
-				"forgegradle" -> PluginPlatform.FORGE_GRADLE
-				else -> throw IllegalArgumentException(
-					"Invalid platform: $value (Available: loom, loom-noremap, loom-remap, moddev, forgegradle)"
-				)
-			}
+	val platform: PluginPlatform by lazy {
+		when (val value = project.findProperty("easy_modding.platform")) {
+			"loom-noremap", "loom" -> PluginPlatform.FABRIC_LOOM
+			"loom-remap" -> PluginPlatform.FABRIC_LOOM_REMAP
+			"moddev" -> PluginPlatform.MODDEV
+			"forgegradle" -> PluginPlatform.FORGE_GRADLE
+			null -> PluginPlatform.NONE
+			else -> throw IllegalArgumentException(
+				"Invalid platform: $value (Available: loom, loom-noremap, loom-remap, moddev, forgegradle)"
+			)
 		}
-	)
+	}
 
 	val fabric = objects.newInstance(FabricExtension::class.java)
 
@@ -64,3 +65,6 @@ abstract class EasyModdingExtension @Inject constructor(
 	val runs = objects.domainObjectContainer(EasyModdingRunConfig::class.java)
 	fun runs(action: Action<NamedDomainObjectContainer<EasyModdingRunConfig>>) = action.execute(runs)
 }
+
+val Project.easyModding: EasyModdingExtension
+	get() = extensions.getByType(EasyModdingExtension::class.java)

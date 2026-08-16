@@ -1,5 +1,6 @@
 package dev.pandasystems.easymodding.platform.forgegradle
 
+import dev.pandasystems.easymodding.extensions.easyModding
 import dev.pandasystems.easymodding.platform.BaseEasyModdingPlatformPlugin
 import net.minecraftforge.gradle.ForgeGradleExtension
 import net.minecraftforge.gradle.MinecraftExtensionForProject

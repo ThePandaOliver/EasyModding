@@ -24,6 +24,7 @@ class NeoForgeTest {
 
 		project.extensions.getByType(EasyModdingExtension::class.java).apply {
 			minecraftVersion.set("1.21")
+			modId.set("easymodding")
 			val resourceUrl = this::class.java.classLoader.getResource("easymodding.mod.json")
 				?: throw IllegalArgumentException("Resource not found")
 			configPath.set(File(resourceUrl.toURI()))

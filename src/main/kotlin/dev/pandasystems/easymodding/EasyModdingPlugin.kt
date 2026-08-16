@@ -17,13 +17,12 @@ class EasyModdingPlugin : Plugin<Project> {
 		target.pluginManager.apply("java-library")
 		target.pluginManager.apply("idea")
 
-		easyModdingExtension.platform.orNull?.let { platform ->
-			when (platform) {
-				PluginPlatform.FABRIC_LOOM -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-noremap")
-				PluginPlatform.FABRIC_LOOM_REMAP -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-remap")
-				PluginPlatform.MODDEV -> target.pluginManager.apply("dev.pandasystems.easymodding.moddev")
-				PluginPlatform.FORGE_GRADLE -> target.pluginManager.apply("dev.pandasystems.easymodding.forgegradle")
-			}
+		when (easyModdingExtension.platform) {
+			PluginPlatform.FABRIC_LOOM -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-noremap")
+			PluginPlatform.FABRIC_LOOM_REMAP -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-remap")
+			PluginPlatform.MODDEV -> target.pluginManager.apply("dev.pandasystems.easymodding.moddev")
+			PluginPlatform.FORGE_GRADLE -> target.pluginManager.apply("dev.pandasystems.easymodding.forgegradle")
+			else -> {}
 		}
 
 		val generateFabricModJson =

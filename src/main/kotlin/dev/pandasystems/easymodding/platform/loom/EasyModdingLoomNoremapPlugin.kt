@@ -1,6 +1,8 @@
 package dev.pandasystems.easymodding.platform.loom
 
+import dev.pandasystems.easymodding.extensions.easyModding
 import dev.pandasystems.easymodding.platform.BaseEasyModdingPlatformPlugin
+import dev.pandasystems.easymodding.util.setOrElseCurrent
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.assign
@@ -24,11 +26,13 @@ class EasyModdingLoomNoremapPlugin : BaseEasyModdingPlatformPlugin() {
 				loom.runConfigs.maybeCreate(it.name)
 				loom.runConfigs.named(it.name) {
 					displayName.convention(it.name)
-					runDirectory.convention(it.workingDirectory)
+					runDirectory.setOrElseCurrent(target.objects, it.workingDirectory)
 					systemProperties.convention(it.systemProperties)
 					jvmArguments.convention(it.jvmArguments)
 					programArguments.convention(it.programArguments)
-					it.sourceSet.orNull?.let { sourceSetName -> sourceSet.convention(sourceSetName) }
+					it.sourceSet.orNull?.let { sourceSetName ->
+						sourceSet.set(sourceSetName)
+					}
 					generateRunConfig.convention(true)
 				}
 			}
