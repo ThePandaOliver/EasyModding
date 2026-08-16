@@ -4,6 +4,7 @@ import dev.pandasystems.easymodding.platform.BaseEasyModdingPlatformPlugin
 import net.minecraftforge.gradle.ForgeGradleExtension
 import net.minecraftforge.gradle.MinecraftExtensionForProject
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.get
 
 class EasyModdingForgeGradlePlugin : BaseEasyModdingPlatformPlugin() {
 	override fun apply(target: Project) {
@@ -31,6 +32,15 @@ class EasyModdingForgeGradlePlugin : BaseEasyModdingPlatformPlugin() {
 				"implementation",
 				minecraft.dependency("net.minecraftforge:forge:${extension.minecraftVersion.get()}-$forgeVersion")
 			)
+
+			extension.runs.forEach {
+				minecraft.runs.create(it.name) {
+					workingDir.convention(it.workingDirectory)
+					systemProperties.convention(it.systemProperties)
+					jvmArgs.convention(it.jvmArguments)
+					args.convention(it.programArguments)
+				}
+			}
 		}
 	}
 }
