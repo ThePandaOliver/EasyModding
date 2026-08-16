@@ -21,13 +21,15 @@ class EasyModdingLoomNoremapPlugin : BaseEasyModdingPlatformPlugin() {
 
 		target.afterEvaluate {
 			extension.runs.forEach {
-				loom.runConfigs.create(it.name) {
+				loom.runConfigs.maybeCreate(it.name)
+				loom.runConfigs.named(it.name) {
 					displayName.convention(it.name)
 					runDirectory.convention(it.workingDirectory)
 					systemProperties.convention(it.systemProperties)
 					jvmArguments.convention(it.jvmArguments)
 					programArguments.convention(it.programArguments)
-					sourceSet.convention(it.sourceSet)
+					it.sourceSet.orNull?.let { sourceSetName -> sourceSet.convention(sourceSetName) }
+					generateRunConfig.convention(true)
 				}
 			}
 		}

@@ -3,9 +3,7 @@ package dev.pandasystems.easymodding.extensions
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ProjectLayout
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
@@ -21,7 +19,7 @@ abstract class EasyModdingExtension @Inject constructor(
 
 	val forge = objects.newInstance(ForgeExtension::class.java)
 
-	val dependencies = objects.newInstance(EasyModdingDependencies::class.java)
+	val modDependencies = objects.newInstance(EasyModdingDependencies::class.java)
 	val runs = objects.domainObjectContainer(EasyModdingRunConfig::class.java)
 
 	fun fabric(action: Action<FabricExtension>) {
@@ -45,7 +43,7 @@ abstract class EasyModdingExtension @Inject constructor(
 
 	fun forge() = forge.enabled.set(true)
 
-	fun dependencies(action: Action<EasyModdingDependencies>) = action.execute(dependencies)
+	fun modDependencies(action: Action<EasyModdingDependencies>) = action.execute(modDependencies)
 
 	fun runs(action: Action<NamedDomainObjectContainer<EasyModdingRunConfig>>) = action.execute(runs)
 }

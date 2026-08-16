@@ -21,12 +21,16 @@ class EasyModdingModdevPlugin : BaseEasyModdingPlatformPlugin() {
 
             extension.runs.forEach {
                 neoForgeExtension.runs.create(it.name) {
+                    when (it.runtimeEnvironment.get()) {
+						"client" -> { client() }
+						"server" -> { server() }
+					}
                     ideName.convention(it.name)
-                    gameDirectory.convention(it.workingDirectory)
+//                    gameDirectory.convention(it.workingDirectory)
                     systemProperties.convention(it.systemProperties)
                     jvmArguments.convention(it.jvmArguments)
                     programArguments.convention(it.programArguments)
-                    sourceSet.convention(javaExtension.sourceSets[it.sourceSet.get()])
+                    it.sourceSet.orNull?.let { sourceSetName -> sourceSet.convention(javaExtension.sourceSets[sourceSetName]) }
                 }
             }
         }

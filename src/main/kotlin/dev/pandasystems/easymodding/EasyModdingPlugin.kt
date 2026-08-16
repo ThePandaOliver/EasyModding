@@ -11,19 +11,12 @@ import org.gradle.language.jvm.tasks.ProcessResources
 
 class EasyModdingPlugin : Plugin<Project> {
 	override fun apply(target: Project) {
-		// Register the `easyModding { }` configuration DSL on the project.
 		val easyModdingExtension = target.extensions.create("easyModding", EasyModdingExtension::class.java)
-
-		// The selected build platform, provided by the consumer (e.g. in gradle.properties as
-		// `easy_modding.platform=loom-noremap`). May be null when the project is not building for a
-		// specific loader (for example a shared "common" subproject).
 		val platform = target.findProperty("easy_modding.platform") as? String
 
-		// Every EasyModding project is a Java project and benefits from IDEA integration.
 		target.pluginManager.apply("java")
 		target.pluginManager.apply("idea")
 
-		// Apply the loader-specific sub-plugin based on the selected platform.
 		when (platform) {
 			"loom-noremap" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-noremap")
 			"loom-remap" -> target.pluginManager.apply("dev.pandasystems.easymodding.loom-remap")
@@ -35,8 +28,6 @@ class EasyModdingPlugin : Plugin<Project> {
 			)
 		}
 
-		// Leaf task that generates `fabric.mod.json`. Only runs when the Fabric loader is
-		// enabled via the `easyModding { fabric() }` DSL.
 		val generateFabricModJson =
 			target.tasks.register("generateFabricModJson", GenerateFabricModJsonTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
@@ -44,8 +35,6 @@ class EasyModdingPlugin : Plugin<Project> {
 				onlyIf { easyModdingExtension.fabric.enabled.getOrElse(false) }
 			}
 
-		// Leaf task that generates NeoForge's `META-INF/neoforge.mods.toml`. Only runs when the
-		// NeoForge loader is enabled via the `easyModding { neoForge() }` DSL.
 		val generateNeoForgeModsToml =
 			target.tasks.register("generateNeoForgeModsToml", GenerateNeoForgeModsTomlTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
@@ -53,8 +42,6 @@ class EasyModdingPlugin : Plugin<Project> {
 				onlyIf { easyModdingExtension.neoForge.enabled.getOrElse(false) }
 			}
 
-		// Leaf task that generates legacy Forge's `META-INF/mods.toml`. Only runs when the Forge
-		// loader is enabled via the `easyModding { forge() }` DSL.
 		val generateForgeModsToml =
 			target.tasks.register("generateForgeModsToml", GenerateForgeModsTomlTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
@@ -62,12 +49,6 @@ class EasyModdingPlugin : Plugin<Project> {
 				onlyIf { easyModdingExtension.forge.enabled.getOrElse(false) }
 			}
 
-		// Leaf task that generates the shared `pack.mcmeta`, understood identically by NeoForge
-		// and Forge. Generated exactly once (rather than once per enabled loader) so that
-		// enabling more than one loader at a time (e.g. in a shared/common module) doesn't make
-		// `processResources` see the same `pack.mcmeta` destination path contributed more than
-		// once, which would fail the build with a duplicate-entry error. Runs whenever NeoForge or
-		// Forge is enabled; Fabric has no use for `pack.mcmeta`, so it doesn't trigger this task.
 		val generatePackResources =
 			target.tasks.register("generatePackResources", GeneratePackMcmetaTask::class.java) {
 				configFile.convention(easyModdingExtension.configPath)
@@ -78,10 +59,6 @@ class EasyModdingPlugin : Plugin<Project> {
 				}
 			}
 
-		// Per-loader lifecycle tasks with no action of their own: they simply group together the
-		// leaf task(s) that make up that loader's metadata, so `./gradlew generate<Loader>Resources`
-		// generates everything that loader needs in one go. `pack.mcmeta` is only relevant to
-		// NeoForge/Forge, so only those two depend on `generatePackResources`; Fabric does not.
 		val generateFabricResources = target.tasks.register("generateFabricResources") {
 			group = "easymodding"
 			description = "Generates every Fabric metadata file (fabric.mod.json)."
@@ -98,12 +75,6 @@ class EasyModdingPlugin : Plugin<Project> {
 			dependsOn(generateForgeModsToml, generatePackResources)
 		}
 
-		// Feed the generated metadata into the standard resource-processing pipeline so the files
-		// end up on the mod's classpath / inside the built jar automatically. `from(...)` is wired
-		// to the leaf tasks directly (rather than the lifecycle tasks above, which have no outputs
-		// of their own) so `processResources` picks up their actual generated files, while still
-		// depending on the lifecycle tasks to keep `./gradlew generate<Loader>Resources` working
-		// as a complete, standalone command.
 		target.tasks.named("processResources", ProcessResources::class.java) {
 			dependsOn(generateFabricResources, generateNeoForgeResources, generateForgeResources)
 			from(generateFabricModJson)
