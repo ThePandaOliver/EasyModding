@@ -39,10 +39,6 @@ tasks.test {
 
 gradlePlugin {
 	plugins {
-		register("easy-modding") {
-			id = "dev.pandasystems.easymodding"
-			implementationClass = "dev.pandasystems.easymodding.EasyModdingPlugin"
-		}
 		register("easy-modding-loom-noremap") {
 			id = "dev.pandasystems.easymodding.loom-noremap"
 			implementationClass = "dev.pandasystems.easymodding.platform.loom.EasyModdingLoomNoremapPlugin"

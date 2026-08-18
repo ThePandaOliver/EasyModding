@@ -1,12 +1,12 @@
-package dev.pandasystems.easymodding.platform.loom
+package dev.pandasystems.easymodding.platform.loom.remap
 
 import dev.pandasystems.easymodding.extensions.easyModding
-import dev.pandasystems.easymodding.platform.BaseEasyModdingPlatformPlugin
+import dev.pandasystems.easymodding.platform.base.EasyModdingPlugin
 import dev.pandasystems.easymodding.util.setOrElseCurrent
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import org.gradle.api.Project
 
-class EasyModdingLoomRemapPlugin : BaseEasyModdingPlatformPlugin() {
+class EasyModdingLoomRemapPlugin : EasyModdingPlugin() {
     override fun apply(target: Project) {
         target.pluginManager.apply("net.fabricmc.fabric-loom-remap")
         val extension = target.easyModding

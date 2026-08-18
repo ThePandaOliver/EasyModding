@@ -1,13 +1,12 @@
 package dev.pandasystems.easymodding.platform.forgegradle
 
 import dev.pandasystems.easymodding.extensions.easyModding
-import dev.pandasystems.easymodding.platform.BaseEasyModdingPlatformPlugin
+import dev.pandasystems.easymodding.platform.base.EasyModdingPlugin
 import net.minecraftforge.gradle.ForgeGradleExtension
 import net.minecraftforge.gradle.MinecraftExtensionForProject
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.get
 
-class EasyModdingForgeGradlePlugin : BaseEasyModdingPlatformPlugin() {
+class EasyModdingForgeGradlePlugin : EasyModdingPlugin() {
 	override fun apply(target: Project) {
 		target.pluginManager.apply("net.minecraftforge.gradle")
 		val extension = target.easyModding

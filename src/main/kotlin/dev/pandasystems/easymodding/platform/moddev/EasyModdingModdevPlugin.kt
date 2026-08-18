@@ -1,7 +1,7 @@
 package dev.pandasystems.easymodding.platform.moddev
 
 import dev.pandasystems.easymodding.extensions.easyModding
-import dev.pandasystems.easymodding.platform.BaseEasyModdingPlatformPlugin
+import dev.pandasystems.easymodding.platform.base.EasyModdingPlugin
 import dev.pandasystems.easymodding.util.setOrElseCurrent
 import net.neoforged.moddevgradle.dsl.NeoForgeExtension
 import org.gradle.api.Project
@@ -9,7 +9,7 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
 
-class EasyModdingModdevPlugin : BaseEasyModdingPlatformPlugin() {
+class EasyModdingModdevPlugin : EasyModdingPlugin() {
 	override fun apply(target: Project) {
 		target.pluginManager.apply("net.neoforged.moddev")
 		val extension = target.easyModding
