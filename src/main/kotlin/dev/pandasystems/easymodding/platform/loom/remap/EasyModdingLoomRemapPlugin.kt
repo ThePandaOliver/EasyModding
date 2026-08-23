@@ -1,14 +1,20 @@
 package dev.pandasystems.easymodding.platform.loom.remap
 
-import dev.pandasystems.easymodding.extensions.easyModding
+import dev.pandasystems.easymodding.platform.base.EasyModdingExtension
 import dev.pandasystems.easymodding.platform.base.EasyModdingPlugin
+import dev.pandasystems.easymodding.platform.base.easyModding
 import dev.pandasystems.easymodding.util.setOrElseCurrent
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import org.gradle.api.Project
 
 class EasyModdingLoomRemapPlugin : EasyModdingPlugin() {
+    override val pluginExtensionClass: Class<out EasyModdingExtension> = EasyModdingLoomRemapExtension::class.java
+
     override fun apply(target: Project) {
         target.pluginManager.apply("net.fabricmc.fabric-loom-remap")
+
+        super.apply(target)
+
         val extension = target.easyModding
         val loom = target.extensions.getByType(LoomGradleExtensionAPI::class.java)
 
@@ -21,6 +27,7 @@ class EasyModdingLoomRemapPlugin : EasyModdingPlugin() {
         target.dependencies.add("mappings", loom.officialMojangMappings())
 
         target.afterEvaluate {
+            // Create run configs
             extension.runs.forEach {
                 loom.runConfigs.maybeCreate(it.name)
                 loom.runConfigs.named(it.name) {

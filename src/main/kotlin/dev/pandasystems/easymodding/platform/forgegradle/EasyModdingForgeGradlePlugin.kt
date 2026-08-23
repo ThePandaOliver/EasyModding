@@ -1,14 +1,20 @@
 package dev.pandasystems.easymodding.platform.forgegradle
 
-import dev.pandasystems.easymodding.extensions.easyModding
+import dev.pandasystems.easymodding.platform.base.EasyModdingExtension
 import dev.pandasystems.easymodding.platform.base.EasyModdingPlugin
+import dev.pandasystems.easymodding.platform.base.easyModding
 import net.minecraftforge.gradle.ForgeGradleExtension
 import net.minecraftforge.gradle.MinecraftExtensionForProject
 import org.gradle.api.Project
 
 class EasyModdingForgeGradlePlugin : EasyModdingPlugin() {
+	override val pluginExtensionClass: Class<out EasyModdingExtension> = EasyModdingForgeGradleExtension::class.java
+
 	override fun apply(target: Project) {
 		target.pluginManager.apply("net.minecraftforge.gradle")
+
+		super.apply(target)
+
 		val extension = target.easyModding
 
 		val minecraft = target.extensions.getByType(MinecraftExtensionForProject::class.java)
@@ -20,8 +26,6 @@ class EasyModdingForgeGradlePlugin : EasyModdingPlugin() {
 		target.repositories.maven(forgeGradle.forgeMaven)
 		target.repositories.maven(forgeGradle.minecraftLibsMaven)
 
-		// Deferred until after evaluation so `minecraftVersion`/`forge.forgeVersion` set inside
-		// the `easyModding { }` block have been populated before we read them.
 		target.afterEvaluate {
 			val forgeVersion = extension.forge.forgeVersion.orNull
 				?: throw IllegalStateException(
@@ -33,6 +37,7 @@ class EasyModdingForgeGradlePlugin : EasyModdingPlugin() {
 				minecraft.dependency("net.minecraftforge:forge:${extension.minecraftVersion.get()}-$forgeVersion")
 			)
 
+			// Create run configs
 			extension.runs.forEach {
 				minecraft.runs.create(it.name) {
 					workingDir.convention(it.workingDirectory)

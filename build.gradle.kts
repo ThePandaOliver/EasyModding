@@ -41,11 +41,11 @@ gradlePlugin {
 	plugins {
 		register("easy-modding-loom-noremap") {
 			id = "dev.pandasystems.easymodding.loom-noremap"
-			implementationClass = "dev.pandasystems.easymodding.platform.loom.EasyModdingLoomNoremapPlugin"
+			implementationClass = "dev.pandasystems.easymodding.platform.loom.noremap.EasyModdingLoomNoremapPlugin"
 		}
 		register("easy-modding-loom-remap") {
 			id = "dev.pandasystems.easymodding.loom-remap"
-			implementationClass = "dev.pandasystems.easymodding.platform.loom.EasyModdingLoomRemapPlugin"
+			implementationClass = "dev.pandasystems.easymodding.platform.loom.remap.EasyModdingLoomRemapPlugin"
 		}
 		register("easy-modding-moddev") {
 			id = "dev.pandasystems.easymodding.moddev"

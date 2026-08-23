@@ -1,14 +1,15 @@
 package dev.pandasystems.easymodding.platform.base
 
 import dev.pandasystems.easymodding.PluginPlatform
-import dev.pandasystems.easymodding.extensions.EasyModdingRunConfig
-import dev.pandasystems.easymodding.extensions.FabricExtension
-import dev.pandasystems.easymodding.extensions.ForgeExtension
-import dev.pandasystems.easymodding.extensions.NeoForgeExtension
+import dev.pandasystems.easymodding.platform.loom.FabricExtension
+import dev.pandasystems.easymodding.platform.forgegradle.ForgeExtension
+import dev.pandasystems.easymodding.platform.moddev.NeoForgeExtension
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.getByName
 
 interface EasyModdingExtension {
 	val minecraftVersion: Property<String>
@@ -49,3 +50,6 @@ interface EasyModdingExtension {
 	val runs: NamedDomainObjectContainer<EasyModdingRunConfig>
 	fun runs(action: Action<NamedDomainObjectContainer<EasyModdingRunConfig>>) = action.execute(runs)
 }
+
+val Project.easyModding: EasyModdingExtension
+	get() = extensions.getByName<EasyModdingExtension>("easyModding")
